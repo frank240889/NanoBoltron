@@ -5,9 +5,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.nanoboltron.JsonSchemaLoader
-import com.example.nanoboltron.JsonSchemaParserImpl
+import com.example.nanoboltron.jsonschema.parser.JsonSchemaParserImpl
 import com.example.nanoboltron.jsonschema.FieldDataHandler
 import com.example.nanoboltron.jsonschema.parser.JsonSchemaParser
+import com.example.nanoboltron.jsonschema.parser.printUiTree
 import com.example.nanoboltron.jsonschema.validation.FieldDataHandlerImpl
 import com.github.erosb.jsonsKema.FormatValidationPolicy
 import com.github.erosb.jsonsKema.JsonParser
@@ -33,7 +34,9 @@ class ParserViewModel : ViewModel() {
         val jsonSchemaLoader = JsonSchemaLoader(context)
         val jsonSchemaString = jsonSchemaLoader.loadJson("jsonschema.json")
         val nodes = jsonSchemaParser.parse(jsonSchemaString)
-        Log.e("nodes", nodes.toString())
+        if (nodes != null) {
+            printUiTree(nodes)
+        }
     }
 
     fun loadJsonSchema(context: Context) {
@@ -48,9 +51,10 @@ class ParserViewModel : ViewModel() {
         val dataString = jsonSchemaLoader.loadJson("jsondata.json")
         val data = JsonParser(dataString).parse()
         val res = validator.validate(data)
-        val mainNode= jsonSchemaParser.parse(jsonSchemaString)
-        val result = res?.message
-        Log.e(this@ParserViewModel::class.java.simpleName, mainNode.toString())
+        val mainNode = jsonSchemaParser.parse(jsonSchemaString)
+        if (mainNode != null) {
+            printUiTree(mainNode)
+        }
     }
 
 }

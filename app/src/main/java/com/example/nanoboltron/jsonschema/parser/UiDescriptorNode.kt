@@ -1,11 +1,9 @@
 package com.example.nanoboltron.jsonschema.parser
 
-import com.example.nanoboltron.jsonschema.ARRAY
 import com.example.nanoboltron.jsonschema.BOOLEAN
 import com.example.nanoboltron.jsonschema.GROUP
 import com.example.nanoboltron.jsonschema.INTEGER
 import com.example.nanoboltron.jsonschema.NUMBER
-import com.example.nanoboltron.jsonschema.OBJECT
 import com.example.nanoboltron.jsonschema.REPEATABLE
 import com.example.nanoboltron.jsonschema.STRING
 
@@ -14,7 +12,7 @@ import com.example.nanoboltron.jsonschema.STRING
  * to the data type they hold.
  * [https://json-schema.org/understanding-json-schema/reference/type]
  */
-sealed class UiNodeDescriptor : JsonSchemaNode {
+sealed class UiDescriptorNode : JsonSchemaNode {
 
     /**
      * The key of the node. Useful to match it against the TypedUISchema. Its value is null for the
@@ -30,7 +28,7 @@ sealed class UiNodeDescriptor : JsonSchemaNode {
     abstract val description: String?
 
     /**
-     * Represent a section/group of fields
+     * Represent a section/group of fields, generally the root node belongs to this type
      */
     data class GroupNode(
         override val key: Key? = null,
@@ -40,11 +38,11 @@ sealed class UiNodeDescriptor : JsonSchemaNode {
         override val description: String? = null,
         val readOnly: Boolean? = null,
         val writeOnly: Boolean? = null,
-        val properties: List<UiNodeDescriptor>? = null
-    ) : UiNodeDescriptor()
+        val properties: List<UiDescriptorNode>? = null
+    ) : UiDescriptorNode()
 
     /**
-     * Represent a repeatable set of items, it will look like depending on its items property
+     * Represent a repeatable set of items
      */
     data class RepeatingGroupNode(
         override val key: Key? = null,
@@ -52,18 +50,18 @@ sealed class UiNodeDescriptor : JsonSchemaNode {
         override val type: String = REPEATABLE,
         override val title: String? = null,
         override val description: String? = null,
-        val default: List<UiNodeDescriptor>? = null,
+        val default: List<UiDescriptorNode>? = null,
         val readOnly: Boolean? = null,
         val writeOnly: Boolean? = null,
-        val items: List<UiNodeDescriptor>? = null
-    ) : UiNodeDescriptor()
+        val items: List<UiDescriptorNode>? = null
+    ) : UiDescriptorNode()
 
 
     /**
      * Represents a single input field or a custom component with predefined values if enum is not
      * null
      */
-    data class StringUiNodeDescriptor(
+    data class StringNode(
         override val key: Key? = null,
         override val path: String? = null,
         override val type: String = STRING,
@@ -80,13 +78,13 @@ sealed class UiNodeDescriptor : JsonSchemaNode {
         val enum: List<String>? = null,
         val contentMediaType: String? = null,
         val contentEncoding: String? = null
-    ) : UiNodeDescriptor()
+    ) : UiDescriptorNode()
 
     /**
      * Represents a single input field or a custom component with predefined values if enum is not
      * null
      */
-    data class NumberUiNodeDescriptor(
+    data class NumberNode(
         override val key: Key? = null,
         override val path: String? = null,
         override val type: String = NUMBER,
@@ -104,13 +102,13 @@ sealed class UiNodeDescriptor : JsonSchemaNode {
          * Can define the steps in a Slider-like component.
          */
         val multipleOf: Double? = null
-    ) : UiNodeDescriptor()
+    ) : UiDescriptorNode()
 
     /**
      * Represents a single input field or a custom component with predefined values if enum is not
      * null
      */
-    data class IntegerUiNodeDescriptor(
+    data class IntegerNode(
         override val key: Key? = null,
         override val path: String? = null,
         override val type: String = INTEGER,
@@ -128,12 +126,12 @@ sealed class UiNodeDescriptor : JsonSchemaNode {
          * Can define the steps in a Slider-like component.
          */
         val multipleOf: Int? = null
-    ) : UiNodeDescriptor()
+    ) : UiDescriptorNode()
 
     /**
      * Represents a single 2-state component.
      */
-    data class BooleanUiNodeDescriptor(
+    data class BooleanNode(
         override val key: Key? = null,
         override val path: String? = null,
         override val type: String = BOOLEAN,
@@ -141,5 +139,5 @@ sealed class UiNodeDescriptor : JsonSchemaNode {
         override val description: String? = null,
         val default: Boolean? = null,
         val readOnly: Boolean? = null,
-    ) : UiNodeDescriptor()
+    ) : UiDescriptorNode()
 }
