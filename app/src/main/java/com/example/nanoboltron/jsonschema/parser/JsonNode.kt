@@ -1,6 +1,7 @@
 package com.example.nanoboltron.jsonschema.parser
 
 typealias Key = String
+
 /**
  * This class represents a JSON Schema node [https://json-schema.org/understanding-json-schema/reference/type]
  * They contain the type of the node and its properties that can be use to describe how the UI
@@ -10,9 +11,9 @@ typealias Key = String
  * Since Kotlin is a strong typed language, undefined properties from JS will be treated as typed-null
  * since we don't have an UNDEFINED type.
  */
-interface JsonSchemaNode {
+interface JsonNode {
     /**
      * The type of node, check [UiDescriptorNode].
      */
-    val type: String
+    val type: String?
 }

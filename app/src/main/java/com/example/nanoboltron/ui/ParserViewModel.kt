@@ -1,13 +1,12 @@
 package com.example.nanoboltron.ui
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.nanoboltron.JsonSchemaLoader
-import com.example.nanoboltron.jsonschema.parser.JsonSchemaParserImpl
-import com.example.nanoboltron.jsonschema.FieldDataHandler
 import com.example.nanoboltron.jsonschema.parser.JsonSchemaParser
+import com.example.nanoboltron.jsonschema.FieldDataHandler
+import com.example.nanoboltron.jsonschema.parser.JsonParser
 import com.example.nanoboltron.jsonschema.parser.printUiTree
 import com.example.nanoboltron.jsonschema.validation.FieldDataHandlerImpl
 import com.github.erosb.jsonsKema.FormatValidationPolicy
@@ -21,7 +20,7 @@ import kotlinx.coroutines.launch
 
 class ParserViewModel : ViewModel() {
 
-    private val jsonSchemaParser: JsonSchemaParser = JsonSchemaParserImpl()
+    private val jsonParser: JsonParser = JsonSchemaParser()
     private val fieldDataHandler: FieldDataHandler = FieldDataHandlerImpl()
 
     fun setValue(path: String? = null, value: Any) {
@@ -33,7 +32,7 @@ class ParserViewModel : ViewModel() {
     fun parseJson(context: Context) {
         val jsonSchemaLoader = JsonSchemaLoader(context)
         val jsonSchemaString = jsonSchemaLoader.loadJson("jsonschema.json")
-        val nodes = jsonSchemaParser.parse(jsonSchemaString)
+        val nodes = jsonParser.parse(jsonSchemaString)
         if (nodes != null) {
             printUiTree(nodes)
         }
@@ -51,7 +50,7 @@ class ParserViewModel : ViewModel() {
         val dataString = jsonSchemaLoader.loadJson("jsondata.json")
         val data = JsonParser(dataString).parse()
         val res = validator.validate(data)
-        val mainNode = jsonSchemaParser.parse(jsonSchemaString)
+        val mainNode = jsonParser.parse(jsonSchemaString)
         if (mainNode != null) {
             printUiTree(mainNode)
         }

@@ -12,7 +12,7 @@ import com.example.nanoboltron.jsonschema.STRING
  * to the data type they hold.
  * [https://json-schema.org/understanding-json-schema/reference/type]
  */
-sealed class UiDescriptorNode : JsonSchemaNode {
+sealed class UiDescriptorNode : JsonNode {
 
     /**
      * The key of the node. Useful to match it against the TypedUISchema. Its value is null for the
