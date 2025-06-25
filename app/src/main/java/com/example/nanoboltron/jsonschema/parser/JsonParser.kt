@@ -1,5 +1,9 @@
 package com.example.nanoboltron.jsonschema.parser
 
+import java.io.IOException
+import kotlin.jvm.Throws
+
 interface JsonParser {
-    fun parse(json: String): JsonParserResult
+    @Throws(IOException::class)
+    fun parse(json: String): JsonNode?
 }

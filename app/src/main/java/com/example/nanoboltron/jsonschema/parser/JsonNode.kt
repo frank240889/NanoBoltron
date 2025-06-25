@@ -13,7 +13,7 @@ typealias Key = String
  */
 interface JsonNode {
     /**
-     * The type of node, check [UiDescriptorNode].
+     * The type of node, check [DescriptorNode].
      */
     val type: String?
 }

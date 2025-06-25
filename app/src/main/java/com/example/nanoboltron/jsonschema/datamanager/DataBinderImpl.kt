@@ -1,5 +1,6 @@
 package com.example.nanoboltron.jsonschema.datamanager
 
+import com.example.nanoboltron.jsonschema.parser.UiDataNode
 import com.example.nanoboltron.jsonschema.parser.Key
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -16,23 +17,24 @@ class DataBinderImpl : DataBinder {
     }
 
     override fun getData(): String? {
-       return mapAdapter.toJsonValue(model).toString()
+        return mapAdapter.toJsonValue(model).toString()
     }
 
     override fun bindData(
         key: Key,
         value: Any,
         path: String?
-    ): DataBindingResult {
+    ): UiDataNode? {
 
-        return DataBindingResult.DataBound("", "", "")
+        return null
     }
 
     override fun update(
         key: Key,
         value: Any,
         path: String?
-    ): DataBindingResult {
-        TODO("Not yet implemented")
+    ): Boolean {
+
+        return false
     }
 }

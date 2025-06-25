@@ -1,0 +1,47 @@
+package com.example.nanoboltron.jsonschema.parser
+
+sealed class UiDataNode : JsonNode {
+    abstract val key: Key?
+    abstract val path: String?
+    abstract val descriptorNode: DescriptorNode
+
+    data class StringDataNode(
+        override val type: String?,
+        override val key: String?,
+        override val path: String,
+        override val descriptorNode: DescriptorNode,
+        val value: String
+    ) : UiDataNode()
+
+    data class NumberDataNode(
+        override val type: String?,
+        override val key: String?,
+        override val path: String,
+        override val descriptorNode: DescriptorNode,
+        val value: Number
+    ) : UiDataNode()
+
+    data class BooleanDataNode(
+        override val type: String?,
+        override val key: String?,
+        override val path: String,
+        override val descriptorNode: DescriptorNode,
+        val value: Boolean
+    ) : UiDataNode()
+
+    data class ObjectDataNode(
+        override val type: String?,
+        override val key: String?,
+        override val path: String,
+        override val descriptorNode: DescriptorNode,
+        val children: List<UiDataNode>
+    ) : UiDataNode()
+
+    data class ArrayDataNode(
+        override val type: String?,
+        override val key: String?,
+        override val path: String,
+        override val descriptorNode: DescriptorNode,
+        val items: List<UiDataNode>
+    ) : UiDataNode()
+}

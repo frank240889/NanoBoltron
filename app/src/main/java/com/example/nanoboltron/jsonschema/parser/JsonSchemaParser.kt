@@ -14,21 +14,16 @@ class JsonSchemaParser : JsonParser {
         Types.newParameterizedType(Map::class.java, String::class.java, Any::class.java)
     private val mapAdapter = moshi.adapter<Map<String, Any?>>(type)
 
-    override fun parse(schema: String): JsonParserResult {
+    override fun parse(schema: String): DescriptorNode? {
         val model: Map<String, Any?> = mapAdapter.fromJson(schema) ?: mapOf()
-        val mainNode = parseGroup(value = model)
-        return if (mainNode == null) {
-            JsonParserResult.Error("Failed to parse schema")
-        } else {
-            JsonParserResult.Success(mainNode)
-        }
+        return parseGroup(value = model)
     }
 
     private fun parseGroup(
         key: Key? = null,
         value: Map<String, Any?>,
         path: String = ""
-    ): UiDescriptorNode.GroupNode? {
+    ): DescriptorNode.GroupNode? {
         val title = value["title"] as? String
         val description = value["description"] as? String
         val readOnly = value["readOnly"] as? Boolean
@@ -41,7 +36,7 @@ class JsonSchemaParser : JsonParser {
             parseNode(fieldKey, fieldSchema, newPath)
         }
 
-        return UiDescriptorNode.GroupNode(
+        return DescriptorNode.GroupNode(
             key = key,
             path = if (path.isBlank()) null else path,
             title = title,
@@ -56,7 +51,7 @@ class JsonSchemaParser : JsonParser {
         key: Key?,
         value: Map<String, Any?>,
         path: String
-    ): UiDescriptorNode? {
+    ): DescriptorNode? {
         return when (value["type"]) {
             "string" -> parseString(key, value, path)
             "number" -> parseNumber(key, value, path)
@@ -72,8 +67,8 @@ class JsonSchemaParser : JsonParser {
         key: Key? = null,
         value: Map<String, Any?>,
         path: String = ""
-    ): UiDescriptorNode.StringNode {
-        return UiDescriptorNode.StringNode(
+    ): DescriptorNode.StringNode {
+        return DescriptorNode.StringNode(
             key = key,
             path = path,
             type = STRING,
@@ -92,8 +87,8 @@ class JsonSchemaParser : JsonParser {
         key: Key? = null,
         value: Map<String, Any?>,
         path: String = ""
-    ): UiDescriptorNode.NumberNode {
-        return UiDescriptorNode.NumberNode(
+    ): DescriptorNode.NumberNode {
+        return DescriptorNode.NumberNode(
             key = key,
             path = path,
             type = NUMBER,
@@ -112,8 +107,8 @@ class JsonSchemaParser : JsonParser {
         key: Key? = null,
         value: Map<String, Any?>,
         path: String = ""
-    ): UiDescriptorNode.IntegerNode {
-        return UiDescriptorNode.IntegerNode(
+    ): DescriptorNode.IntegerNode {
+        return DescriptorNode.IntegerNode(
             key = key,
             path = path,
             type = INTEGER,
@@ -132,8 +127,8 @@ class JsonSchemaParser : JsonParser {
         key: Key? = null,
         value: Map<String, Any?>,
         path: String = ""
-    ): UiDescriptorNode.BooleanNode {
-        return UiDescriptorNode.BooleanNode(
+    ): DescriptorNode.BooleanNode {
+        return DescriptorNode.BooleanNode(
             key = key,
             path = path,
             type = BOOLEAN,
@@ -148,7 +143,7 @@ class JsonSchemaParser : JsonParser {
         key: Key? = null,
         value: Map<String, Any?>,
         path: String = ""
-    ): UiDescriptorNode.RepeatingGroupNode {
+    ): DescriptorNode.RepeatingGroupNode {
         val rawItems = value["items"]
         val parsedItems = when (rawItems) {
             is Map<*, *> -> listOfNotNull(parseNode(key, rawItems as Map<String, Any>, path))
@@ -160,7 +155,7 @@ class JsonSchemaParser : JsonParser {
 
             else -> null
         }
-        return UiDescriptorNode.RepeatingGroupNode(
+        return DescriptorNode.RepeatingGroupNode(
             key = key,
             path = path,
             type = REPEATABLE,

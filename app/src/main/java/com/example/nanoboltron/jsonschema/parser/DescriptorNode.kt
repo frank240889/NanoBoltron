@@ -12,7 +12,7 @@ import com.example.nanoboltron.jsonschema.STRING
  * to the data type they hold.
  * [https://json-schema.org/understanding-json-schema/reference/type]
  */
-sealed class UiDescriptorNode : JsonNode {
+sealed class DescriptorNode : JsonNode {
 
     /**
      * The key of the node. Useful to match it against the TypedUISchema. Its value is null for the
@@ -38,8 +38,8 @@ sealed class UiDescriptorNode : JsonNode {
         override val description: String? = null,
         val readOnly: Boolean? = null,
         val writeOnly: Boolean? = null,
-        val properties: List<UiDescriptorNode>? = null
-    ) : UiDescriptorNode()
+        val properties: List<DescriptorNode>? = null
+    ) : DescriptorNode()
 
     /**
      * Represent a repeatable set of items
@@ -50,11 +50,11 @@ sealed class UiDescriptorNode : JsonNode {
         override val type: String = REPEATABLE,
         override val title: String? = null,
         override val description: String? = null,
-        val default: List<UiDescriptorNode>? = null,
+        val default: List<DescriptorNode>? = null,
         val readOnly: Boolean? = null,
         val writeOnly: Boolean? = null,
-        val items: List<UiDescriptorNode>? = null
-    ) : UiDescriptorNode()
+        val items: List<DescriptorNode>? = null
+    ) : DescriptorNode()
 
 
     /**
@@ -78,7 +78,7 @@ sealed class UiDescriptorNode : JsonNode {
         val enum: List<String>? = null,
         val contentMediaType: String? = null,
         val contentEncoding: String? = null
-    ) : UiDescriptorNode()
+    ) : DescriptorNode()
 
     /**
      * Represents a single input field or a custom component with predefined values if enum is not
@@ -102,7 +102,7 @@ sealed class UiDescriptorNode : JsonNode {
          * Can define the steps in a Slider-like component.
          */
         val multipleOf: Double? = null
-    ) : UiDescriptorNode()
+    ) : DescriptorNode()
 
     /**
      * Represents a single input field or a custom component with predefined values if enum is not
@@ -126,7 +126,7 @@ sealed class UiDescriptorNode : JsonNode {
          * Can define the steps in a Slider-like component.
          */
         val multipleOf: Int? = null
-    ) : UiDescriptorNode()
+    ) : DescriptorNode()
 
     /**
      * Represents a single 2-state component.
@@ -139,5 +139,5 @@ sealed class UiDescriptorNode : JsonNode {
         override val description: String? = null,
         val default: Boolean? = null,
         val readOnly: Boolean? = null,
-    ) : UiDescriptorNode()
+    ) : DescriptorNode()
 }
