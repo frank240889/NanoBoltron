@@ -13,7 +13,7 @@ typealias Key = String
  */
 interface JsonNode {
     /**
-     * The type of node, check [DescriptorNode].
+     * The type of node, check [com.example.nanoboltron.jsonschema.parser.parsers.DescriptorNode].
      */
     val type: String?
 }

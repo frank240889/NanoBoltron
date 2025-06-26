@@ -1,6 +1,6 @@
 package com.example.nanoboltron.jsonschema.datamanager
 
-import com.example.nanoboltron.jsonschema.parser.DescriptorNode
+import com.example.nanoboltron.jsonschema.parser.parsers.DescriptorNode
 
 sealed class SimpleRenderableNode {
     abstract val descriptorNode: DescriptorNode

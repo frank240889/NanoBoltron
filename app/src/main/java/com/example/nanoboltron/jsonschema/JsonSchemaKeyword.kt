@@ -21,19 +21,17 @@ internal const val PROPERTIES = "properties"
 /**
  * Data types
  */
-internal const val STRING = "string"
-internal const val NUMBER = "number"
-internal const val INTEGER = "integer"
-internal const val BOOLEAN = "boolean"
-internal const val OBJECT = "object"
-internal const val ARRAY = "array"
-internal const val NULL = "null"
+internal const val STRING_NODE = "string"
+internal const val NUMBER_NODE = "number"
+internal const val BOOLEAN_NODE = "boolean"
+internal const val OBJECT_NODE = "object"
+internal const val ARRAY_NODE = "array"
 
 /**
  * UI types
  */
 internal const val GROUP = "group"
-internal const val REPEATABLE = "repeatable"
+internal const val REPEATABLE_GROUP = "repeatable"
 
 /**
  * Subschemas
@@ -41,6 +39,7 @@ internal const val REPEATABLE = "repeatable"
 internal const val ANY_OF = "anyOf"
 internal const val ONE_OF = "oneOf"
 internal const val ALL_OF = "allOf"
+internal val selectionOperators = arrayOf(ANY_OF, ONE_OF, ALL_OF)
 
 /**
  * Conditional

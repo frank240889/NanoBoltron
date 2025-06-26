@@ -1,5 +1,7 @@
 package com.example.nanoboltron.jsonschema.parser
 
+import com.example.nanoboltron.jsonschema.parser.parsers.DescriptorNode
+
 sealed class UiDataNode : JsonNode {
     abstract val key: Key?
     abstract val path: String?

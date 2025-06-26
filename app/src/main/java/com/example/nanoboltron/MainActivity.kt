@@ -35,7 +35,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
+        viewModel.addContext(application)
         setContent {
             var text by remember { mutableStateOf("") }
             var result by remember { mutableStateOf<String?>(null) }
@@ -70,7 +70,7 @@ class MainActivity : ComponentActivity() {
 
                         ElevatedButton(
                             onClick = {
-                                viewModel.parseJson(this@MainActivity)
+                                viewModel.parseJson()
                             }
                         ) {
                             Text("Parse")

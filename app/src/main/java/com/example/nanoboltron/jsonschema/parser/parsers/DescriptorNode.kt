@@ -1,11 +1,11 @@
-package com.example.nanoboltron.jsonschema.parser
+package com.example.nanoboltron.jsonschema.parser.parsers
 
-import com.example.nanoboltron.jsonschema.BOOLEAN
+import com.example.nanoboltron.jsonschema.BOOLEAN_NODE
 import com.example.nanoboltron.jsonschema.GROUP
-import com.example.nanoboltron.jsonschema.INTEGER
-import com.example.nanoboltron.jsonschema.NUMBER
-import com.example.nanoboltron.jsonschema.REPEATABLE
-import com.example.nanoboltron.jsonschema.STRING
+import com.example.nanoboltron.jsonschema.NUMBER_NODE
+import com.example.nanoboltron.jsonschema.STRING_NODE
+import com.example.nanoboltron.jsonschema.parser.JsonNode
+import com.example.nanoboltron.jsonschema.parser.Key
 
 /**
  * The next descriptor classes convey the idea of how should the node be represented in the UI according
@@ -38,22 +38,7 @@ sealed class DescriptorNode : JsonNode {
         override val description: String? = null,
         val readOnly: Boolean? = null,
         val writeOnly: Boolean? = null,
-        val properties: List<DescriptorNode>? = null
-    ) : DescriptorNode()
-
-    /**
-     * Represent a repeatable set of items
-     */
-    data class RepeatingGroupNode(
-        override val key: Key? = null,
-        override val path: String? = null,
-        override val type: String = REPEATABLE,
-        override val title: String? = null,
-        override val description: String? = null,
-        val default: List<DescriptorNode>? = null,
-        val readOnly: Boolean? = null,
-        val writeOnly: Boolean? = null,
-        val items: List<DescriptorNode>? = null
+        val nodes: List<DescriptorNode>? = null
     ) : DescriptorNode()
 
 
@@ -64,7 +49,7 @@ sealed class DescriptorNode : JsonNode {
     data class StringNode(
         override val key: Key? = null,
         override val path: String? = null,
-        override val type: String = STRING,
+        override val type: String = STRING_NODE,
         override val title: String? = null,
         override val description: String? = null,
         val default: String? = null,
@@ -87,45 +72,21 @@ sealed class DescriptorNode : JsonNode {
     data class NumberNode(
         override val key: Key? = null,
         override val path: String? = null,
-        override val type: String = NUMBER,
+        override val type: String = NUMBER_NODE,
         override val title: String? = null,
         override val description: String? = null,
-        val default: Double? = null,
+        val default: Number? = null,
         val placeholder: String? = null,
         val readOnly: Boolean? = null,
         val writeOnly: Boolean? = null,
         /**
          * A set of predefined values
          */
-        val enum: List<Double>? = null,
+        val enum: List<Number>? = null,
         /**
          * Can define the steps in a Slider-like component.
          */
-        val multipleOf: Double? = null
-    ) : DescriptorNode()
-
-    /**
-     * Represents a single input field or a custom component with predefined values if enum is not
-     * null
-     */
-    data class IntegerNode(
-        override val key: Key? = null,
-        override val path: String? = null,
-        override val type: String = INTEGER,
-        override val title: String? = null,
-        override val description: String? = null,
-        val default: Int? = null,
-        val placeholder: String? = null,
-        val readOnly: Boolean? = null,
-        val writeOnly: Boolean? = null,
-        /**
-         * A set of predefined values
-         */
-        val enum: List<Int>? = null,
-        /**
-         * Can define the steps in a Slider-like component.
-         */
-        val multipleOf: Int? = null
+        val multipleOf: Number? = null
     ) : DescriptorNode()
 
     /**
@@ -134,7 +95,7 @@ sealed class DescriptorNode : JsonNode {
     data class BooleanNode(
         override val key: Key? = null,
         override val path: String? = null,
-        override val type: String = BOOLEAN,
+        override val type: String = BOOLEAN_NODE,
         override val title: String? = null,
         override val description: String? = null,
         val default: Boolean? = null,

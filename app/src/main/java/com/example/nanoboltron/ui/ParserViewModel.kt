@@ -3,25 +3,15 @@ package com.example.nanoboltron.ui
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.nanoboltron.JsonSchemaLoader
+import com.example.nanoboltron.jsonschema.parser.JsonDataParser
 import com.example.nanoboltron.jsonschema.parser.JsonSchemaParser
-import com.example.nanoboltron.jsonschema.FieldDataHandler
-import com.example.nanoboltron.jsonschema.parser.JsonParser
-import com.example.nanoboltron.jsonschema.parser.printUiTree
+import com.example.nanoboltron.jsonschema.processor.JsonProcessorImpl
 import com.example.nanoboltron.jsonschema.validation.FieldDataHandlerImpl
-import com.github.erosb.jsonsKema.FormatValidationPolicy
-import com.github.erosb.jsonsKema.JsonParser
-import com.github.erosb.jsonsKema.JsonValue
-import com.github.erosb.jsonsKema.Schema
-import com.github.erosb.jsonsKema.SchemaLoader
-import com.github.erosb.jsonsKema.Validator
-import com.github.erosb.jsonsKema.ValidatorConfig
 import kotlinx.coroutines.launch
 
 class ParserViewModel : ViewModel() {
-
-    private val jsonParser: JsonParser = JsonSchemaParser()
-    private val fieldDataHandler: FieldDataHandler = FieldDataHandlerImpl()
+    private val jsonProcessor = JsonProcessorImpl(JsonSchemaParser(), JsonDataParser())
+    private val fieldDataHandler: com.example.nanoboltron.jsonschema.FieldDataHandler = FieldDataHandlerImpl()
 
     fun setValue(path: String? = null, value: Any) {
         viewModelScope.launch {
@@ -29,17 +19,17 @@ class ParserViewModel : ViewModel() {
         }
     }
 
-    fun parseJson(context: Context) {
-        val jsonSchemaLoader = JsonSchemaLoader(context)
-        val jsonSchemaString = jsonSchemaLoader.loadJson("jsonschema.json")
-        val nodes = jsonParser.parse(jsonSchemaString)
-        if (nodes != null) {
-            printUiTree(nodes)
-        }
+    fun addContext(context: Context) {
+        jsonProcessor.addContext(context)
+    }
+
+    fun parseJson() {
+        jsonProcessor.loadSchema("default", "jsonschema.json")
+        jsonProcessor.loadData("default", "jsondata.json")
     }
 
     fun loadJsonSchema(context: Context) {
-        val jsonSchemaLoader = JsonSchemaLoader(context)
+        /*val jsonSchemaLoader = JsonLoader(context)
         val jsonSchemaString = jsonSchemaLoader.loadJson("jsonschema.json")
         val jsonSchemaObject: JsonValue = JsonParser(jsonSchemaString).parse()
         val schema: Schema = SchemaLoader(jsonSchemaObject).load()
@@ -53,7 +43,7 @@ class ParserViewModel : ViewModel() {
         val mainNode = jsonParser.parse(jsonSchemaString)
         if (mainNode != null) {
             printUiTree(mainNode)
-        }
+        }*/
     }
 
 }

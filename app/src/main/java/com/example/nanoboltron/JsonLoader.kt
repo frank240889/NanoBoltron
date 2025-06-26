@@ -4,7 +4,7 @@ import android.content.Context
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
-class JsonSchemaLoader(private val context: Context) {
+class JsonLoader(private val context: Context) {
     fun loadJson(schemaName: String): String {
         val inputStream = context.assets.open(schemaName)
         val reader = BufferedReader(InputStreamReader(inputStream))

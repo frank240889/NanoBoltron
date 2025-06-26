@@ -1,143 +1,96 @@
 {
-  "definitions": {
-    "Thing": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/user-system.schema.json",
+  "title": "UserSystem",
+  "type": "object",
+  "required": ["users", "metadata"],
+  "properties": {
+    "metadata": {
       "type": "object",
       "properties": {
-        "name": {
+        "version": {
           "type": "string",
-          "default": "Default name"
+          "pattern": "^v\\d+\\.\\d+\\.\\d+$"
+        },
+        "generatedAt": {
+          "type": "string",
+          "format": "date-time"
         }
-      }
-    }
-  },
-  "type": "object",
-  "properties": {
-    "listOfStrings": {
-      "type": "array",
-      "title": "A list of strings",
-      "items": {
-        "type": "string",
-        "default": "bazinga"
-      }
+      },
+      "required": ["version"]
     },
-    "multipleChoicesList": {
+    "users": {
       "type": "array",
-      "title": "A multiple choices list",
       "items": {
-        "type": "string",
-        "enum": [
-          "foo",
-          "bar",
-          "fuzz",
-          "qux"
+        "allOf": [
+          {
+            "$ref": "#/$defs/baseUser"
+          },
+          {
+            "oneOf": [
+              { "$ref": "#/$defs/adminUser" },
+              { "$ref": "#/$defs/regularUser" }
+            ]
+          }
         ]
       },
-      "uniqueItems": true
-    },
-    "fixedItemsList": {
-      "type": "array",
-      "title": "A list of fixed items",
-      "items": [
-        {
-          "title": "A string value",
+      "minItems": 1
+    }
+  },
+  "$defs": {
+    "baseUser": {
+      "type": "object",
+      "required": ["id", "email"],
+      "properties": {
+        "id": {
           "type": "string",
-          "default": "lorem ipsum"
+          "pattern": "^[a-f0-9]{24}$"
         },
-        {
-          "title": "a boolean value",
-          "type": "boolean"
-        }
-      ],
-      "additionalItems": {
-        "title": "Additional item",
-        "type": "number"
-      }
-    },
-    "minItemsList": {
-      "type": "array",
-      "title": "A list with a minimal number of items",
-      "minItems": 3,
-      "items": {
-        "$ref": "#/definitions/Thing"
-      }
-    },
-    "defaultsAndMinItems": {
-      "type": "array",
-      "title": "List and item level defaults",
-      "minItems": 5,
-      "default": [
-        "carp",
-        "trout",
-        "bream"
-      ],
-      "items": {
-        "type": "string",
-        "default": "unidentified"
-      }
-    },
-    "nestedList": {
-      "type": "array",
-      "title": "Nested list",
-      "items": {
-        "type": "array",
-        "title": "Inner list",
-        "items": {
+        "email": {
           "type": "string",
-          "default": "lorem ipsum"
-        }
-      }
-    },
-    "unorderable": {
-      "title": "Unorderable items",
-      "type": "array",
-      "items": {
-        "type": "string",
-        "default": "lorem ipsum"
-      }
-    },
-    "copyable": {
-      "title": "Copyable items",
-      "type": "array",
-      "items": {
-        "type": "string",
-        "default": "lorem ipsum"
-      }
-    },
-    "unremovable": {
-      "title": "Unremovable items",
-      "type": "array",
-      "items": {
-        "type": "string",
-        "default": "lorem ipsum"
-      }
-    },
-    "noToolbar": {
-      "title": "No add, remove and order buttons",
-      "type": "array",
-      "items": {
-        "type": "string",
-        "default": "lorem ipsum"
-      }
-    },
-    "fixedNoToolbar": {
-      "title": "Fixed array without buttons",
-      "type": "array",
-      "items": [
-        {
-          "title": "A number",
-          "type": "number",
-          "default": 42
+          "format": "email"
         },
-        {
-          "title": "A boolean",
-          "type": "boolean",
-          "default": false
+        "role": {
+          "type": "string",
+          "enum": ["admin", "user", "guest"]
         }
-      ],
-      "additionalItems": {
-        "title": "A string",
-        "type": "string",
-        "default": "lorem ipsum"
+      }
+    },
+    "adminUser": {
+      "type": "object",
+      "properties": {
+        "role": { "const": "admin" },
+        "adminSettings": {
+          "type": "object",
+          "required": ["accessLevel"],
+          "properties": {
+            "accessLevel": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10
+            }
+          }
+        }
+      },
+      "required": ["adminSettings"]
+    },
+    "regularUser": {
+      "type": "object",
+      "properties": {
+        "role": { "const": "user" },
+        "preferences": {
+          "type": "object",
+          "properties": {
+            "theme": {
+              "type": "string",
+              "enum": ["light", "dark"]
+            },
+            "language": {
+              "type": "string",
+              "minLength": 2
+            }
+          }
+        }
       }
     }
   }
