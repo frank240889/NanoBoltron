@@ -1,6 +1,5 @@
 package com.example.nanoboltron.jsonschema.parser.parsers
 
-import com.example.nanoboltron.jsonschema.STRING_NODE
 import com.example.nanoboltron.jsonschema.parser.Key
 
 class StringDescriptorParser : NodeParser {

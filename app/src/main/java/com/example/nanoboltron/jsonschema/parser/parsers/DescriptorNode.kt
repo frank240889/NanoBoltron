@@ -49,7 +49,7 @@ sealed class DescriptorNode : JsonNode {
                             append("\n${indent}  nodes: [")
                             nodeList.forEachIndexed { index, node ->
                                 append(
-                                    "\n${indent}    ${index + 1}. ${
+                                    "\n${indent}[${index + 1}]${
                                         node.toStringIndented(
                                             indentLevel + 2
                                         )
@@ -65,9 +65,9 @@ sealed class DescriptorNode : JsonNode {
                 }
             }
 
-            is StringNode -> "${indent}StringNode(key: $key, type: $type, title: \"$title\")"
-            is NumberNode -> "${indent}NumberNode(key: $key, type: $type, title: \"$title\")"
-            is BooleanNode -> "${indent}BooleanNode(key: $key, type: $type, title: \"$title\")"
+            is StringNode -> "${indent}$this"
+            is NumberNode -> "${indent}$this"
+            is BooleanNode -> "${indent}$this"
             is CompositionNode -> {
                 buildString {
                     append("${indent}CompositionNode(")
@@ -76,7 +76,7 @@ sealed class DescriptorNode : JsonNode {
                     title?.let { append("\n${indent}  title: \"$it\"") }
                     append("\n${indent}  schemas: [")
                     schemas.forEachIndexed { index, schema ->
-                        append("\n${indent}    ${index + 1}. ${schema.toStringIndented(indentLevel + 2)}")
+                        append("\n${indent}[${index + 1}]${schema.toStringIndented(indentLevel + 2)}")
                     }
                     append("\n${indent}  ]")
                     append("\n${indent})")
