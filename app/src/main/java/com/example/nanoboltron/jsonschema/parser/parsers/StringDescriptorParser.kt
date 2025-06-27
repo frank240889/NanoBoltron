@@ -8,7 +8,8 @@ class StringDescriptorParser : NodeParser {
         type: String,
         key: Key?,
         value: Map<String, Any?>,
-        path: String
+        path: String,
+        isRootNode: Boolean
     ): DescriptorNode.StringNode {
         return DescriptorNode.StringNode(
             key = key,

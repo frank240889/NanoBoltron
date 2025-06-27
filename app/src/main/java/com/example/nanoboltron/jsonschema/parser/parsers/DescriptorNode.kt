@@ -28,7 +28,77 @@ sealed class DescriptorNode : JsonNode {
     abstract val description: String?
 
     /**
-     * Represent a section/group of fields, generally the root node belongs to this type
+     * Helper function to create indented string representation
+     */
+    fun toStringIndented(indentLevel: Int = 0): String {
+        val indent = "  ".repeat(indentLevel)
+        return when (this) {
+            is GroupNode -> {
+                buildString {
+                    append("GroupNode(")
+                    append("\n${indent}  type: $type")
+                    key?.let { append("\n${indent}  key: $it") }
+                    path?.let { append("\n${indent}  path: $it") }
+                    title?.let { append("\n${indent}  title: \"$it\"") }
+                    description?.let { append("\n${indent}  description: \"$it\"") }
+                    readOnly?.let { append("\n${indent}  readOnly: $it") }
+                    writeOnly?.let { append("\n${indent}  writeOnly: $it") }
+
+                    nodes?.let { nodeList ->
+                        if (nodeList.isNotEmpty()) {
+                            append("\n${indent}  nodes: [")
+                            nodeList.forEachIndexed { index, node ->
+                                append(
+                                    "\n${indent}    ${index + 1}. ${
+                                        node.toStringIndented(
+                                            indentLevel + 2
+                                        )
+                                    }"
+                                )
+                            }
+                            append("\n${indent}  ]")
+                        } else {
+                            append("\n${indent}  nodes: []")
+                        }
+                    }
+                    append("\n${indent})")
+                }
+            }
+
+            is StringNode -> "${indent}StringNode(key: $key, type: $type, title: \"$title\")"
+            is NumberNode -> "${indent}NumberNode(key: $key, type: $type, title: \"$title\")"
+            is BooleanNode -> "${indent}BooleanNode(key: $key, type: $type, title: \"$title\")"
+            is CompositionNode -> {
+                buildString {
+                    append("${indent}CompositionNode(")
+                    append("\n${indent}  compositionType: $compositionType")
+                    key?.let { append("\n${indent}  key: $it") }
+                    title?.let { append("\n${indent}  title: \"$it\"") }
+                    append("\n${indent}  schemas: [")
+                    schemas.forEachIndexed { index, schema ->
+                        append("\n${indent}    ${index + 1}. ${schema.toStringIndented(indentLevel + 2)}")
+                    }
+                    append("\n${indent}  ]")
+                    append("\n${indent})")
+                }
+            }
+
+            is ConditionalNode -> {
+                buildString {
+                    append("${indent}ConditionalNode(")
+                    key?.let { append("\n${indent}  key: $it") }
+                    title?.let { append("\n${indent}  title: \"$it\"") }
+                    ifSchema?.let { append("\n${indent}  if: ${it.toStringIndented(indentLevel + 1)}") }
+                    thenSchema?.let { append("\n${indent}  then: ${it.toStringIndented(indentLevel + 1)}") }
+                    elseSchema?.let { append("\n${indent}  else: ${it.toStringIndented(indentLevel + 1)}") }
+                    append("\n${indent})")
+                }
+            }
+        }
+    }
+
+    /**
+     * Represents a section/group of fields, generally the root node belongs to this type
      */
     data class GroupNode(
         override val key: Key? = null,
@@ -39,7 +109,11 @@ sealed class DescriptorNode : JsonNode {
         val readOnly: Boolean? = null,
         val writeOnly: Boolean? = null,
         val nodes: List<DescriptorNode>? = null
-    ) : DescriptorNode()
+    ) : DescriptorNode() {
+        override fun toString(): String {
+            return toStringIndented(0)
+        }
+    }
 
 
     /**
@@ -100,5 +174,32 @@ sealed class DescriptorNode : JsonNode {
         override val description: String? = null,
         val default: Boolean? = null,
         val readOnly: Boolean? = null,
+    ) : DescriptorNode()
+
+    /**
+     * Represents a composition of multiple schemas using allOf, anyOf, or oneOf
+     */
+    data class CompositionNode(
+        override val key: Key? = null,
+        override val path: String? = null,
+        override val type: String,
+        override val title: String? = null,
+        override val description: String? = null,
+        val compositionType: String, // "allOf", "anyOf", "oneOf"
+        val schemas: List<DescriptorNode>
+    ) : DescriptorNode()
+
+    /**
+     * Represents conditional schema logic using if-then-else
+     */
+    data class ConditionalNode(
+        override val key: Key? = null,
+        override val path: String? = null,
+        override val type: String = "conditional",
+        override val title: String? = null,
+        override val description: String? = null,
+        val ifSchema: DescriptorNode?,
+        val thenSchema: DescriptorNode?,
+        val elseSchema: DescriptorNode?
     ) : DescriptorNode()
 }

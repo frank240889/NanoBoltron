@@ -7,6 +7,7 @@ interface NodeParser {
         type: String,
         key: Key? = null,
         value: Map<String, Any?>,
-        path: String = ""
+        path: String = "",
+        isRootNode: Boolean = false
     ): DescriptorNode
 }

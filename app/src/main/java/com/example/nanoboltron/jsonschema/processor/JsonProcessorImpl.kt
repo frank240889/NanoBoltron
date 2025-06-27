@@ -1,6 +1,7 @@
 package com.example.nanoboltron.jsonschema.processor
 
 import android.content.Context
+import android.util.Log
 import com.example.nanoboltron.JsonLoader
 import com.example.nanoboltron.jsonschema.parser.parsers.DescriptorNode
 import com.example.nanoboltron.jsonschema.parser.FormDataNode
@@ -20,8 +21,8 @@ class JsonProcessorImpl constructor(
         val jsonLoader = JsonLoader(context)
         val jsonSchemaString = jsonLoader.loadJson("jsonschema.json")
         val nodes = jsonSchemaParser.parse(jsonSchemaString)
-        if (nodes != null && nodes is DescriptorNode) {
-            printUiTree(nodes)
+        if (nodes != null && nodes is DescriptorNode.GroupNode) {
+            Log.e("NODES", nodes.toString())
         }
     }
 
@@ -29,9 +30,9 @@ class JsonProcessorImpl constructor(
         val jsonLoader = JsonLoader(context)
         val jsonSchemaString = jsonLoader.loadJson("jsondata.json")
         val nodes = jsonDataParser.parse(jsonSchemaString)
-        if (nodes != null && nodes is FormDataNode) {
+        /*if (nodes != null && nodes is FormDataNode) {
             printUiTree(nodes)
-        }
+        }*/
     }
 
     override fun updateValue(key: String, value: Any, path: String?): JsonProcessorResult {

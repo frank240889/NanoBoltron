@@ -31,6 +31,6 @@ class JsonSchemaParser : JsonParser {
         value: Map<String, Any?>,
         path: String = ""
     ): DescriptorNode {
-        return groupDescriptorParser.parse(GROUP,key, value, path)
+        return groupDescriptorParser.parse(GROUP, key, value, path, isRootNode = true)
     }
 }

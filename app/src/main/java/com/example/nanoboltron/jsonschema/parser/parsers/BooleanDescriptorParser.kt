@@ -8,7 +8,8 @@ class BooleanDescriptorParser : NodeParser {
         type: String,
         key: Key?,
         value: Map<String, Any?>,
-        path: String
+        path: String,
+        isRootNode: Boolean
     ): DescriptorNode.BooleanNode {
         return DescriptorNode.BooleanNode(
             key = key,
