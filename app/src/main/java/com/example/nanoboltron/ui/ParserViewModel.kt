@@ -24,7 +24,7 @@ class ParserViewModel : ViewModel() {
     }
 
     fun parseJson() {
-        jsonProcessor.loadSchema("default", "jsonschema.json")
+        val mainNode = jsonProcessor.loadSchema("default", "jsonschema.json")
         jsonProcessor.loadData("default", "jsondata.json")
     }
 

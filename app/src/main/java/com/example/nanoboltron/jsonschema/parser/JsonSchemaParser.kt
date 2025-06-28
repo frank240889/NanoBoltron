@@ -85,6 +85,26 @@ class JsonSchemaParser : JsonParser {
         }
     }
 
+    private fun handleIfThenElse(
+        key: Key?,
+        value: Map<String, Any?>,
+        path: String
+    ): DescriptorNode {
+        val ifSchema = value[IF] as? Map<String, Any?>
+        val thenSchema = value[THEN] as? Map<String, Any?>
+        val elseSchema = value[ELSE] as? Map<String, Any?>
+
+        return DescriptorNode.ConditionalNode(
+            key = key,
+            path = if (path.isBlank()) null else path,
+            title = value[TITLE] as? String,
+            description = value[DESCRIPTION] as? String,
+            ifSchema = ifSchema?.let { parseNode(null, it, "$path.if", false) },
+            thenSchema = thenSchema?.let { parseNode(null, it, "$path.then", false) },
+            elseSchema = elseSchema?.let { parseNode(null, it, "$path.else", false) }
+        )
+    }
+
     private fun parseObjectNode(
         key: Key?,
         value: Map<String, Any?>,
@@ -96,7 +116,24 @@ class JsonSchemaParser : JsonParser {
         val readOnly = value[READ_ONLY] as? Boolean
         val writeOnly = value[WRITE_ONLY] as? Boolean
 
-        val nodes = parseObjectProperties(value, path)
+        // For object nodes, pass the current path + key to children
+        val childrenPath = if (isRootNode) {
+            "properties"
+        } else if (path.isEmpty()) {
+            key ?: "unknown"
+        } else if (key == null) {
+            path  // Don't add null key to path
+        } else if (key?.startsWith("allOf[") == true || key?.startsWith("oneOf[") == true || key?.startsWith(
+                "anyOf["
+            ) == true
+        ) {
+            // For composition children, use path + ".properties" instead of path + key + ".properties"
+            "$path.properties"
+        } else {
+            "$path.$key"
+        }
+
+        val nodes = parseObjectProperties(value, childrenPath)
 
         return DescriptorNode.GroupNode(
             type = OBJECT_NODE,
@@ -121,7 +158,14 @@ class JsonSchemaParser : JsonParser {
         val readOnly = value[READ_ONLY] as? Boolean
         val writeOnly = value[WRITE_ONLY] as? Boolean
 
-        val nodes = parseArrayItems(value, path, key)
+        // For array nodes, pass the current path + key to children
+        val childrenPath = if (path.isEmpty()) {
+            key ?: "unknown"
+        } else {
+            "$path.$key"
+        }
+
+        val nodes = parseArrayItems(value, childrenPath, key)
 
         return DescriptorNode.GroupNode(
             type = REPEATABLE_GROUP,
@@ -138,7 +182,9 @@ class JsonSchemaParser : JsonParser {
     private fun handleAllOf(key: Key?, value: Map<String, Any?>, path: String): DescriptorNode {
         val schemas = value[ALL_OF] as? List<Map<String, Any?>> ?: emptyList()
         val parsedSchemas = schemas.mapIndexedNotNull { index, schema ->
-            parseNode(null, schema, "$path.allOf.$index", false)
+            val allOfKey = "allOf[$index]"
+            val allOfPath = if (path.isBlank()) "allOf[$index]" else "$path.allOf[$index]"
+            parseNode(allOfKey, schema, allOfPath, false)
         }
 
         // For allOf, we can either merge compatible schemas or create a CompositionNode
@@ -147,7 +193,7 @@ class JsonSchemaParser : JsonParser {
             parseNode(key, mergedSchema, path, false)
         } else {
             DescriptorNode.CompositionNode(
-                key = key,
+                key = "allOf",
                 path = if (path.isBlank()) null else path,
                 type = "composition",
                 title = value[TITLE] as? String,
@@ -161,11 +207,13 @@ class JsonSchemaParser : JsonParser {
     private fun handleAnyOf(key: Key?, value: Map<String, Any?>, path: String): DescriptorNode {
         val schemas = value[ANY_OF] as? List<Map<String, Any?>> ?: emptyList()
         val parsedSchemas = schemas.mapIndexedNotNull { index, schema ->
-            parseNode(null, schema, "$path.anyOf.$index", false)
+            val anyOfKey = "anyOf[$index]"
+            val anyOfPath = if (path.isBlank()) "anyOf[$index]" else "$path.anyOf[$index]"
+            parseNode(anyOfKey, schema, anyOfPath, false)
         }
 
         return DescriptorNode.CompositionNode(
-            key = key,
+            key = "anyOf",
             path = if (path.isBlank()) null else path,
             type = "composition",
             title = value[TITLE] as? String,
@@ -178,37 +226,19 @@ class JsonSchemaParser : JsonParser {
     private fun handleOneOf(key: Key?, value: Map<String, Any?>, path: String): DescriptorNode {
         val schemas = value[ONE_OF] as? List<Map<String, Any?>> ?: emptyList()
         val parsedSchemas = schemas.mapIndexedNotNull { index, schema ->
-            parseNode(null, schema, "$path.oneOf.$index", false)
+            val oneOfKey = "oneOf[$index]"
+            val oneOfPath = if (path.isBlank()) "oneOf[$index]" else "$path.oneOf[$index]"
+            parseNode(oneOfKey, schema, oneOfPath, false)
         }
 
         return DescriptorNode.CompositionNode(
-            key = key,
+            key = "oneOf",
             path = if (path.isBlank()) null else path,
             type = "composition",
             title = value[TITLE] as? String,
             description = value[DESCRIPTION] as? String,
             compositionType = ONE_OF,
             schemas = parsedSchemas
-        )
-    }
-
-    private fun handleIfThenElse(
-        key: Key?,
-        value: Map<String, Any?>,
-        path: String
-    ): DescriptorNode {
-        val ifSchema = value[IF] as? Map<String, Any?>
-        val thenSchema = value[THEN] as? Map<String, Any?>
-        val elseSchema = value[ELSE] as? Map<String, Any?>
-
-        return DescriptorNode.ConditionalNode(
-            key = key,
-            path = if (path.isBlank()) null else path,
-            title = value[TITLE] as? String,
-            description = value[DESCRIPTION] as? String,
-            ifSchema = ifSchema?.let { parseNode(null, it, "$path.if", false) },
-            thenSchema = thenSchema?.let { parseNode(null, it, "$path.then", false) },
-            elseSchema = elseSchema?.let { parseNode(null, it, "$path.else", false) }
         )
     }
 
@@ -231,14 +261,14 @@ class JsonSchemaParser : JsonParser {
         val mergedProperties = mutableMapOf<String, Any?>()
 
         // Add properties from base schema
-        (baseSchema[PROPERTIES] as? Map<*, *>)?.forEach { (key, value) ->
-            mergedProperties[key as String] = value
+        (baseSchema[PROPERTIES] as? Map<String, Any?>)?.forEach { (key, value) ->
+            mergedProperties[key] = value
         }
 
         // Merge properties from all schemas
         schemas.forEach { schema ->
-            (schema[PROPERTIES] as? Map<*, *>)?.forEach { (key, value) ->
-                mergedProperties[key as String] = value
+            (schema[PROPERTIES] as? Map<String, Any?>)?.forEach { (key, value) ->
+                mergedProperties[key] = value
             }
         }
 
@@ -252,23 +282,11 @@ class JsonSchemaParser : JsonParser {
         value: Map<String, Any?>,
         path: String
     ): List<DescriptorNode>? {
-        val newPath = if (path.isEmpty()) PROPERTIES else "$path.$PROPERTIES"
-
-        return (value[PROPERTIES] as? Map<*, *>)?.mapNotNull { (rawKey, rawSchema) ->
+        return (value[PROPERTIES] as? Map<String, Any?>)?.mapNotNull { (rawKey, rawSchema) ->
             val fieldKey = rawKey as? String ?: return@mapNotNull null
             val fieldSchema = rawSchema as? Map<String, Any?> ?: return@mapNotNull null
-            val type = fieldSchema[TYPE] as? String
-            val isFinalNode = type == STRING_NODE ||
-                    type == NUMBER_NODE ||
-                    type == BOOLEAN_NODE ||
-                    type == INTEGER_NODE
 
-            val composePath = if (isFinalNode) {
-                newPath
-            } else {
-                "$newPath.$fieldKey"
-            }
-            parseNode(fieldKey, fieldSchema, composePath, false)
+            parseNode(fieldKey, fieldSchema, path, false)
         }
     }
 
@@ -277,17 +295,30 @@ class JsonSchemaParser : JsonParser {
         path: String,
         key: Key?
     ): List<DescriptorNode>? {
-        val newPath = "$path.$ITEMS"
-
         return (value[ITEMS])?.let { rawItems ->
             when (rawItems) {
                 is Map<*, *> -> {
-                    listOfNotNull(parseNode(key, rawItems as Map<String, Any?>, newPath, false))
+                    val itemSchema = rawItems as Map<String, Any?>
+                    // For single item schema, parse with items path
+                    val itemsPath = "$path.items"
+
+                    // Don't extract key for single items - let properties be parsed directly
+                    listOfNotNull(parseNode(null, itemSchema, itemsPath, false))
                 }
 
                 is List<*> -> rawItems.mapIndexedNotNull { index, it ->
                     (it as? Map<String, Any?>)?.let { itemSchema ->
-                        parseNode(null, itemSchema, "$newPath.$index", false)
+                        // For tuple arrays, don't use .items, use direct indexing
+                        val itemsPath = "$path[$index]"
+
+                        // For array items, the key should include the index
+                        val itemKey = if (itemSchema.containsKey(PROPERTIES)) {
+                            val propertyKey =
+                                (itemSchema[PROPERTIES] as? Map<String, Any?>)?.keys?.firstOrNull() as? String
+                            "${propertyKey}[$index]"
+                        } else "item[$index]"
+
+                        parseNode(itemKey, itemSchema, itemsPath, false)
                     }
                 }
 

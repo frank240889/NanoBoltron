@@ -26,7 +26,6 @@ sealed class DescriptorNode : JsonNode {
     abstract val path: String?
     abstract val title: String?
     abstract val description: String?
-
     /**
      * Helper function to create indented string representation
      */

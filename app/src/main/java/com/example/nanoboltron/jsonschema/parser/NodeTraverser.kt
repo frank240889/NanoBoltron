@@ -20,6 +20,70 @@ class NodeTraverser {
     )
 
     /**
+     * Traverses the entire tree and applies a transformation to each node.
+     * Similar to Kotlin's map function but for descriptor node trees.
+     * Returns a list of transformation results.
+     */
+    fun <T> mapNodes(
+        rootNode: DescriptorNode,
+        transform: (node: DescriptorNode, path: String, key: String?, depth: Int) -> T
+    ): List<T> {
+        val results = mutableListOf<T>()
+        traverseAndTransform(rootNode, "", null, 0, transform, results)
+        return results
+    }
+
+    /**
+     * Traverses the tree and applies a transformation, but only returns non-null results.
+     * Useful when you want to filter and transform in one operation.
+     */
+    fun <T> mapNotNull(
+        rootNode: DescriptorNode,
+        transform: (node: DescriptorNode, path: String, key: String?, depth: Int) -> T?
+    ): List<T> {
+        val results = mutableListOf<T>()
+        traverseAndTransformNotNull(rootNode, "", null, 0, transform, results)
+        return results
+    }
+
+    /**
+     * Traverses the tree and applies a side-effect operation to each node.
+     * Returns Unit - used when you want to perform operations on nodes without collecting results.
+     */
+    fun forEachNode(
+        rootNode: DescriptorNode,
+        action: (node: DescriptorNode, path: String, key: String?, depth: Int) -> Unit
+    ) {
+        traverseAndApply(rootNode, "", null, 0, action)
+    }
+
+    /**
+     * Traverses the tree and applies a conditional transformation.
+     * Only transforms nodes that match the predicate.
+     */
+    fun <T> mapWhere(
+        rootNode: DescriptorNode,
+        predicate: (node: DescriptorNode, path: String, key: String?, depth: Int) -> Boolean,
+        transform: (node: DescriptorNode, path: String, key: String?, depth: Int) -> T
+    ): List<T> {
+        val results = mutableListOf<T>()
+        traverseAndTransformWhere(rootNode, "", null, 0, predicate, transform, results)
+        return results
+    }
+
+    /**
+     * Finds the first node that matches the predicate and applies transformation.
+     * Returns null if no matching node is found.
+     */
+    fun <T> findAndTransform(
+        rootNode: DescriptorNode,
+        predicate: (node: DescriptorNode, path: String, key: String?, depth: Int) -> Boolean,
+        transform: (node: DescriptorNode, path: String, key: String?, depth: Int) -> T
+    ): T? {
+        return findFirstMatch(rootNode, "", null, 0, predicate, transform)
+    }
+
+    /**
      * Traverses the entire node tree and returns all nodes with their paths
      */
     fun getAllPaths(rootNode: DescriptorNode): List<NodePath> {
@@ -94,6 +158,246 @@ class NodeTraverser {
         }
     }
 
+    // Private helper methods for the traversal operations
+
+    private fun <T> traverseAndTransform(
+        node: DescriptorNode,
+        currentPath: String,
+        key: String?,
+        depth: Int,
+        transform: (DescriptorNode, String, String?, Int) -> T,
+        results: MutableList<T>
+    ) {
+        val fullPath = getFullPath(node, currentPath)
+
+        // Apply transformation to current node
+        results.add(transform(node, fullPath, key, depth))
+
+        // Traverse children
+        traverseChildren(node, fullPath, depth + 1) { childNode, childPath, childKey, childDepth ->
+            traverseAndTransform(childNode, childPath, childKey, childDepth, transform, results)
+        }
+    }
+
+    private fun <T> traverseAndTransformNotNull(
+        node: DescriptorNode,
+        currentPath: String,
+        key: String?,
+        depth: Int,
+        transform: (DescriptorNode, String, String?, Int) -> T?,
+        results: MutableList<T>
+    ) {
+        val fullPath = getFullPath(node, currentPath)
+
+        // Apply transformation to current node, add only if not null
+        transform(node, fullPath, key, depth)?.let { results.add(it) }
+
+        // Traverse children
+        traverseChildren(node, fullPath, depth + 1) { childNode, childPath, childKey, childDepth ->
+            traverseAndTransformNotNull(
+                childNode,
+                childPath,
+                childKey,
+                childDepth,
+                transform,
+                results
+            )
+        }
+    }
+
+    private fun traverseAndApply(
+        node: DescriptorNode,
+        currentPath: String,
+        key: String?,
+        depth: Int,
+        action: (DescriptorNode, String, String?, Int) -> Unit
+    ) {
+        val fullPath = getFullPath(node, currentPath)
+
+        // Apply action to current node
+        action(node, fullPath, key, depth)
+
+        // Traverse children
+        traverseChildren(node, fullPath, depth + 1) { childNode, childPath, childKey, childDepth ->
+            traverseAndApply(childNode, childPath, childKey, childDepth, action)
+        }
+    }
+
+    private fun <T> traverseAndTransformWhere(
+        node: DescriptorNode,
+        currentPath: String,
+        key: String?,
+        depth: Int,
+        predicate: (DescriptorNode, String, String?, Int) -> Boolean,
+        transform: (DescriptorNode, String, String?, Int) -> T,
+        results: MutableList<T>
+    ) {
+        val fullPath = getFullPath(node, currentPath)
+
+        // Apply transformation only if predicate matches
+        if (predicate(node, fullPath, key, depth)) {
+            results.add(transform(node, fullPath, key, depth))
+        }
+
+        // Traverse children
+        traverseChildren(node, fullPath, depth + 1) { childNode, childPath, childKey, childDepth ->
+            traverseAndTransformWhere(
+                childNode,
+                childPath,
+                childKey,
+                childDepth,
+                predicate,
+                transform,
+                results
+            )
+        }
+    }
+
+    private fun <T> findFirstMatch(
+        node: DescriptorNode,
+        currentPath: String,
+        key: String?,
+        depth: Int,
+        predicate: (DescriptorNode, String, String?, Int) -> Boolean,
+        transform: (DescriptorNode, String, String?, Int) -> T
+    ): T? {
+        val fullPath = getFullPath(node, currentPath)
+
+        // Check if current node matches
+        if (predicate(node, fullPath, key, depth)) {
+            return transform(node, fullPath, key, depth)
+        }
+
+        // Search in children
+        when (node) {
+            is DescriptorNode.GroupNode -> {
+                node.nodes?.forEach { childNode ->
+                    val childKey = childNode.key
+                    val childPath = if (fullPath == "root") {
+                        childKey ?: "unknown"
+                    } else {
+                        childNode.path ?: "$fullPath.${childKey ?: "unknown"}"
+                    }
+                    findFirstMatch(
+                        childNode,
+                        childPath,
+                        childKey,
+                        depth + 1,
+                        predicate,
+                        transform
+                    )?.let {
+                        return it
+                    }
+                }
+            }
+
+            is DescriptorNode.CompositionNode -> {
+                node.schemas.forEachIndexed { index, childNode ->
+                    val compositionType = node.compositionType
+                    val childPath = "$fullPath.$compositionType.$index"
+                    findFirstMatch(
+                        childNode,
+                        childPath,
+                        null,
+                        depth + 1,
+                        predicate,
+                        transform
+                    )?.let {
+                        return it
+                    }
+                }
+            }
+
+            is DescriptorNode.ConditionalNode -> {
+                node.ifSchema?.let { ifNode ->
+                    findFirstMatch(
+                        ifNode,
+                        "$fullPath.if",
+                        null,
+                        depth + 1,
+                        predicate,
+                        transform
+                    )?.let {
+                        return it
+                    }
+                }
+                node.thenSchema?.let { thenNode ->
+                    findFirstMatch(
+                        thenNode,
+                        "$fullPath.then",
+                        null,
+                        depth + 1,
+                        predicate,
+                        transform
+                    )?.let {
+                        return it
+                    }
+                }
+                node.elseSchema?.let { elseNode ->
+                    findFirstMatch(
+                        elseNode,
+                        "$fullPath.else",
+                        null,
+                        depth + 1,
+                        predicate,
+                        transform
+                    )?.let {
+                        return it
+                    }
+                }
+            }
+
+            // Leaf nodes have no children
+            else -> {}
+        }
+
+        return null
+    }
+
+    private fun traverseChildren(
+        node: DescriptorNode,
+        fullPath: String,
+        childDepth: Int,
+        action: (DescriptorNode, String, String?, Int) -> Unit
+    ) {
+        when (node) {
+            is DescriptorNode.GroupNode -> {
+                node.nodes?.forEach { childNode ->
+                    val childKey = childNode.key
+                    val childPath = if (fullPath == "root") {
+                        childKey ?: "unknown"
+                    } else {
+                        childNode.path ?: "$fullPath.${childKey ?: "unknown"}"
+                    }
+                    action(childNode, childPath, childKey, childDepth)
+                }
+            }
+
+            is DescriptorNode.CompositionNode -> {
+                node.schemas.forEachIndexed { index, childNode ->
+                    val compositionType = node.compositionType
+                    val childPath = "$fullPath.$compositionType.$index"
+                    action(childNode, childPath, null, childDepth)
+                }
+            }
+
+            is DescriptorNode.ConditionalNode -> {
+                node.ifSchema?.let { ifNode ->
+                    action(ifNode, "$fullPath.if", null, childDepth)
+                }
+                node.thenSchema?.let { thenNode ->
+                    action(thenNode, "$fullPath.then", null, childDepth)
+                }
+                node.elseSchema?.let { elseNode ->
+                    action(elseNode, "$fullPath.else", null, childDepth)
+                }
+            }
+
+            // Leaf nodes have no children
+            else -> {}
+        }
+    }
+
     private fun traverseNode(
         node: DescriptorNode,
         currentPath: String,
@@ -162,6 +466,14 @@ class NodeTraverser {
             is DescriptorNode.BooleanNode -> "BooleanNode"
             is DescriptorNode.CompositionNode -> "CompositionNode(${node.compositionType})"
             is DescriptorNode.ConditionalNode -> "ConditionalNode"
+        }
+    }
+
+    private fun getFullPath(node: DescriptorNode, currentPath: String): String {
+        return if (currentPath.isEmpty()) {
+            node.path ?: "root"
+        } else {
+            node.path ?: currentPath
         }
     }
 }
