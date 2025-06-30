@@ -6,8 +6,8 @@ interface NodeParser {
     fun parse(
         type: String,
         key: Key? = null,
+        path: String? = null,
         value: Map<String, Any?>,
-        path: String = "",
         isRootNode: Boolean = false
     ): DescriptorNode
 }

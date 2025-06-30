@@ -6,8 +6,8 @@ class StringDescriptorParser : NodeParser {
     override fun parse(
         type: String,
         key: Key?,
+        path: String?,
         value: Map<String, Any?>,
-        path: String,
         isRootNode: Boolean
     ): DescriptorNode.StringNode {
         return DescriptorNode.StringNode(

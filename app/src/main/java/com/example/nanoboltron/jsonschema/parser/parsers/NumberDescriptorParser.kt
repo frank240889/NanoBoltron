@@ -7,8 +7,8 @@ class NumberDescriptorParser : NodeParser {
     override fun parse(
         type: String,
         key: Key?,
+        path: String?,
         value: Map<String, Any?>,
-        path: String,
         isRootNode: Boolean
     ): DescriptorNode.NumberNode {
         return DescriptorNode.NumberNode(
