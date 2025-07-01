@@ -5,6 +5,7 @@ import com.example.nanoboltron.jsonschema.ALL_OF
 import com.example.nanoboltron.jsonschema.ANY_OF
 import com.example.nanoboltron.jsonschema.ARRAY_NODE
 import com.example.nanoboltron.jsonschema.BOOLEAN_NODE
+import com.example.nanoboltron.jsonschema.CONST
 import com.example.nanoboltron.jsonschema.DESCRIPTION
 import com.example.nanoboltron.jsonschema.ELSE
 import com.example.nanoboltron.jsonschema.IF
@@ -50,14 +51,18 @@ class JsonSchemaParser : JsonParser {
     ): DescriptorNode {
         // Check for composition keywords first (they can coexist with other keywords)
         when {
-            value.containsKey(ALL_OF) -> return handleAllOf(path, value, isRootNode)
-            value.containsKey(ANY_OF) -> return handleAnyOf(key, path, value)
-            value.containsKey(ONE_OF) -> return handleOneOf(key, path, value)
-            value.containsKey(IF) -> return handleIfThenElse(key, path, value)
+            value.containsKey(ALL_OF) -> return handleAllOf(key, path, value, isRootNode)
+            value.containsKey(ANY_OF) -> return handleAnyOf(key, path, value, isRootNode)
+            value.containsKey(ONE_OF) -> return handleOneOf(key, path, value, isRootNode)
+            value.containsKey(IF) -> return handleIfThenElse(key, path, value, isRootNode)
         }
 
         // Type inference according to JSON Schema spec
         val inferredType = inferNodeType(value)
+        Log.e(
+            "---------------------------",
+            "------------------------------------------------------------------"
+        )
         Log.e("inferredType", inferredType.toString())
 
         return when (inferredType) {
@@ -91,6 +96,7 @@ class JsonSchemaParser : JsonParser {
         key: Key?,
         path: String?,
         value: Map<String, Any?>,
+        isRootNode: Boolean = false
     ): DescriptorNode {
         val ifSchema = value[IF] as? Map<String, Any?>
         val thenSchema = value[THEN] as? Map<String, Any?>
@@ -157,7 +163,10 @@ class JsonSchemaParser : JsonParser {
         } else {
             "$path.$key"
         }
-        Log.e("parseArrayNode", "key: $key, path: $path, value: $value, isRootNode: $isRootNode")
+        Log.e(
+            "parseArrayNode",
+            "key: $key, path: $path, childrenPath: $childrenPath, value: $value, isRootNode: $isRootNode"
+        )
         val items = value[ITEMS]
         val nodes = parseArrayItems(items, childrenPath)
 
@@ -173,36 +182,41 @@ class JsonSchemaParser : JsonParser {
         )
     }
 
-    private fun handleAllOf(path: String?, value: Map<String, Any?>, isRootNode: Boolean): DescriptorNode {
+    private fun handleAllOf(
+        key: Key?,
+        path: String?,
+        value: Map<String, Any?>,
+        isRootNode: Boolean
+    ): DescriptorNode {
         val schemas = value[ALL_OF] as? List<Map<String, Any?>> ?: emptyList()
         val parsedSchemas = schemas.mapIndexed { index, schema ->
-            val allOfKey = ALL_OF
-            val allOfPath = if (isRootNode) ALL_OF else "$path.$ALL_OF[$index]"
+            val allOfKey = "[$index]"
+            val allOfPath = if (isRootNode) ALL_OF else "$path.$key.$ALL_OF"
             parseNode(allOfKey, allOfPath, schema, false)
         }
 
-        // For allOf, we can either merge compatible schemas or create a CompositionNode
-        return if (canMergeSchemas(schemas)) {
-            val mergedSchema = mergeSchemas(schemas, value)
-            parseNode(ALL_OF, path, mergedSchema, false)
-        } else {
-            DescriptorNode.CompositionNode(
-                key = "allOf",
-                path = if (path.isNullOrBlank()) null else path,
-                type = "composition",
-                title = value[TITLE] as? String,
-                description = value[DESCRIPTION] as? String,
-                compositionType = ALL_OF,
-                schemas = parsedSchemas
-            )
-        }
+        return DescriptorNode.CompositionNode(
+            key = ALL_OF,
+            path = path,
+            type = "composition",
+            title = value[TITLE] as? String,
+            description = value[DESCRIPTION] as? String,
+            compositionType = ALL_OF,
+            schemas = parsedSchemas
+        )
+
     }
 
-    private fun handleAnyOf(key: Key?, path: String?, value: Map<String, Any?>): DescriptorNode {
+    private fun handleAnyOf(
+        key: Key?,
+        path: String?,
+        value: Map<String, Any?>,
+        isRootNode: Boolean = false
+    ): DescriptorNode {
         val schemas = value[ANY_OF] as? List<Map<String, Any?>> ?: emptyList()
         val parsedSchemas = schemas.mapIndexed { index, schema ->
-            val anyOfKey = "anyOf"
-            val anyOfPath = if (path.isNullOrEmpty()) "anyOf[$index]" else "$path.anyOf[$index]"
+            val anyOfKey = "[$index]"
+            val anyOfPath = if (isRootNode) ANY_OF else "$path.$key.$ANY_OF"
             parseNode(anyOfKey, anyOfPath, schema, false)
         }
 
@@ -217,59 +231,28 @@ class JsonSchemaParser : JsonParser {
         )
     }
 
-    private fun handleOneOf(key: Key?, path: String?, value: Map<String, Any?>): DescriptorNode {
+    private fun handleOneOf(
+        key: Key?,
+        path: String?,
+        value: Map<String, Any?>,
+        isRootNode: Boolean = false
+    ): DescriptorNode {
         val schemas = value[ONE_OF] as? List<Map<String, Any?>> ?: emptyList()
         val parsedSchemas = schemas.mapIndexed { index, schema ->
-            val oneOfKey = "oneOf"
-            val oneOfPath = if (path.isNullOrEmpty()) "oneOf[$index]" else "$path.oneOf[$index]"
+            val oneOfKey = "[$index]"
+            val oneOfPath = if (isRootNode) ONE_OF else "$path.$key.$ONE_OF"
             parseNode(oneOfKey, oneOfPath, schema, false)
         }
 
         return DescriptorNode.CompositionNode(
-            key = "oneOf",
-            path = if (path.isNullOrEmpty()) null else path,
+            key = ONE_OF,
+            path = path,
             type = "composition",
             title = value[TITLE] as? String,
             description = value[DESCRIPTION] as? String,
             compositionType = ONE_OF,
             schemas = parsedSchemas
         )
-    }
-
-    private fun canMergeSchemas(schemas: List<Map<String, Any?>>): Boolean {
-        // Simple heuristic: can merge if all schemas are objects with properties
-        return schemas.all { schema ->
-            schema.containsKey(PROPERTIES) &&
-                    !schema.containsKey(ANY_OF) &&
-                    !schema.containsKey(ONE_OF) &&
-                    !schema.containsKey(ALL_OF) &&
-                    !schema.containsKey(IF)
-        }
-    }
-
-    private fun mergeSchemas(
-        schemas: List<Map<String, Any?>>,
-        baseSchema: Map<String, Any?>
-    ): Map<String, Any?> {
-        val merged = baseSchema.toMutableMap()
-        val mergedProperties = mutableMapOf<String, Any?>()
-
-        // Add properties from base schema
-        (baseSchema[PROPERTIES] as? Map<String, Any?>)?.forEach { (key, value) ->
-            mergedProperties[key] = value
-        }
-
-        // Merge properties from all schemas
-        schemas.forEach { schema ->
-            (schema[PROPERTIES] as? Map<String, Any?>)?.forEach { (key, value) ->
-                mergedProperties[key] = value
-            }
-        }
-
-        merged[PROPERTIES] = mergedProperties
-        merged.remove(ALL_OF) // Remove the allOf since we've merged it
-
-        return merged
     }
 
     private fun parseProperties(
@@ -300,13 +283,8 @@ class JsonSchemaParser : JsonParser {
                         (node as? Map<String, Any?>)?.let { itemSchema ->
                             // For tuple arrays, don't use .items, use direct indexing
                             val itemsPath = "$path[$index]"
-
                             // For array items, the key should include the index
-                            val itemKey = "[$index]"/*if (itemSchema.containsKey(PROPERTIES)) {
-                                val propertyKey =
-                                    (itemSchema[PROPERTIES] as? Map<String, Any?>)?.keys?.firstOrNull() as? String
-                                "${propertyKey}[$index]"
-                            } else "item[$index]"*/
+                            val itemKey = "[$index]"
                             parseNode(itemKey, itemsPath, itemSchema, false)
                         }
                     }
@@ -324,6 +302,19 @@ class JsonSchemaParser : JsonParser {
         return when {
             value.containsKey(PROPERTIES) -> OBJECT_NODE
             value.containsKey(ITEMS) -> ARRAY_NODE
+            value.containsKey(CONST) -> checkValue(value[CONST])
+            else -> null
+        }
+    }
+
+    private fun checkValue(any: Any?): String? {
+        return when (any) {
+            is Int -> INTEGER_NODE
+            is String -> STRING_NODE
+            is Boolean -> BOOLEAN_NODE
+            is Double -> NUMBER_NODE
+            is List<*> -> ARRAY_NODE
+            is Map<*, *> -> OBJECT_NODE
             else -> null
         }
     }

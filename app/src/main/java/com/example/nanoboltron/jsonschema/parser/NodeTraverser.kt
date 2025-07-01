@@ -273,7 +273,7 @@ class NodeTraverser {
             is DescriptorNode.GroupNode -> {
                 node.nodes?.forEach { childNode ->
                     val childKey = childNode.key
-                    val childPath = if (fullPath == "root") {
+                    val childPath = if (fullPath == "") {
                         childKey ?: "unknown"
                     } else {
                         childNode.path ?: "$fullPath.${childKey ?: "unknown"}"
@@ -471,7 +471,7 @@ class NodeTraverser {
 
     private fun getFullPath(node: DescriptorNode, currentPath: String): String {
         return if (currentPath.isEmpty()) {
-            node.path ?: "root"
+            node.path ?: ""
         } else {
             node.path ?: currentPath
         }

@@ -13,6 +13,7 @@ internal const val ENUM = "enum"
 internal const val CONTENT_MEDIA_TYPE = "contentMediaType"
 internal const val CONTENT_ENCODING = "contentEncoding"
 internal const val ITEMS = "items"
+internal const val CONST = "const"
 internal const val FORMAT = "format"
 internal const val PROPERTIES = "properties"
 
