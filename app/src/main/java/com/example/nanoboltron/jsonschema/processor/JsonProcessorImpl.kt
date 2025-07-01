@@ -31,8 +31,8 @@ class JsonProcessorImpl constructor(
             /*traverser.forEachNode(nodes) { node, path, key, depth ->
                 Log.d("JsonProcessor", "🔍 Node at path: $path, key: $key, depth: $depth")
             }*/
-            val node = traverser
-                .findAndTransform(
+            traverser
+                .findAllAndTransform(
                     rootNode = nodes,
                     predicate = { node, path, key, depth ->
                         //path == "properties.users.items.allOf.[1].oneOf.[1].properties.preferences.properties" &&
@@ -42,7 +42,10 @@ class JsonProcessorImpl constructor(
                         node
                     }
                 )
-            Log.d("NODE", node.toString())
+                .forEach {
+                    Log.d("NODE", it.toString())
+                }
+
             // Perform complete schema analysis with one simple call
             //schemaAnalyzer.performCompleteAnalysis(nodes, name, "JsonProcessor")
         } else {

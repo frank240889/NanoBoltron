@@ -84,6 +84,18 @@ class NodeTraverser {
     }
 
     /**
+     * Finds all nodes that match the predicate and applies transformation to each.
+     * Returns a list of transformed results for all matching nodes.
+     */
+    fun <T> findAllAndTransform(
+        rootNode: DescriptorNode,
+        predicate: (node: DescriptorNode, path: String, key: String?, depth: Int) -> Boolean,
+        transform: (node: DescriptorNode, path: String, key: String?, depth: Int) -> T
+    ): List<T> {
+        return mapWhere(rootNode, predicate, transform)
+    }
+
+    /**
      * Traverses the entire node tree and returns all nodes with their paths
      */
     fun getAllPaths(rootNode: DescriptorNode): List<NodePath> {
