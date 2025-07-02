@@ -2,6 +2,7 @@
 agp = "8.9.1"
 foundation = "1.8.2"
 javaxInject = "1"
+jsonFormsComposeMaterial = "0.7.0"
 jsonSchemaValidator = "1.0.76"
 jsonSkema = "0.22.0"
 kotlin = "2.0.21"
@@ -20,6 +21,7 @@ moshiKotlin = "1.15.1"
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "foundation" }
 javax-inject = { module = "javax.inject:javax.inject", version.ref = "javaxInject" }
+json-forms-compose-material = { module = "io.github.copper-leaf:json-forms-compose-material", version.ref = "jsonFormsComposeMaterial" }
 json-schema-validator = { module = "com.networknt:json-schema-validator", version.ref = "jsonSchemaValidator" }
 json-skema = { module = "com.github.erosb:json-sKema", version.ref = "jsonSkema" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

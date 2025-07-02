@@ -1,5 +1,6 @@
 package com.example.nanoboltron.jsonschema.parser
 
+import com.example.nanoboltron.jsonschema.core.JsonNode
 import java.io.IOException
 import kotlin.jvm.Throws
 

@@ -4,7 +4,7 @@ import com.example.nanoboltron.jsonschema.BOOLEAN_NODE
 import com.example.nanoboltron.jsonschema.GROUP
 import com.example.nanoboltron.jsonschema.NUMBER_NODE
 import com.example.nanoboltron.jsonschema.STRING_NODE
-import com.example.nanoboltron.jsonschema.parser.JsonNode
+import com.example.nanoboltron.jsonschema.core.JsonNode
 import com.example.nanoboltron.jsonschema.parser.Key
 
 /**

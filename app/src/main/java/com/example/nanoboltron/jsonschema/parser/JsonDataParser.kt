@@ -1,5 +1,6 @@
 package com.example.nanoboltron.jsonschema.parser
 
+import com.example.nanoboltron.jsonschema.core.JsonNode
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 

@@ -2,14 +2,13 @@ package com.example.nanoboltron.jsonschema.parser.parsers
 
 import android.content.Context
 import android.util.Log
-import com.example.nanoboltron.jsonschema.parser.JsonNode
+import com.example.nanoboltron.jsonschema.core.JsonNode
 import com.example.nanoboltron.jsonschema.parser.JsonParser
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.networknt.schema.JsonSchemaFactory
 import com.networknt.schema.SchemaValidatorsConfig
 import com.networknt.schema.SpecVersion
 import com.networknt.schema.ValidationMessage
-import com.networknt.schema.ValidatorTypeCode
 import com.networknt.schema.walk.JsonSchemaWalkListener
 import com.networknt.schema.walk.WalkEvent
 import com.networknt.schema.walk.WalkFlow

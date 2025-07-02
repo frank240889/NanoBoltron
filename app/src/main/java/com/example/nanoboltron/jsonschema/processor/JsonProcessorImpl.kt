@@ -5,14 +5,9 @@ import android.util.Log
 import com.example.nanoboltron.JsonLoader
 import com.example.nanoboltron.jsonschema.analyzer.SchemaAnalyzer
 import com.example.nanoboltron.jsonschema.parser.parsers.DescriptorNode
-import com.example.nanoboltron.jsonschema.parser.FormDataNode
-import com.example.nanoboltron.jsonschema.parser.JsonNode
+import com.example.nanoboltron.jsonschema.core.JsonNode
 import com.example.nanoboltron.jsonschema.parser.JsonParser
 import com.example.nanoboltron.jsonschema.parser.NodeTraverser
-import com.example.nanoboltron.jsonschema.parser.UiDataNode
-import com.example.nanoboltron.jsonschema.parser.parsers.WalkParser
-import com.example.nanoboltron.jsonschema.parser.printUiTree
-import com.github.erosb.jsonsKema.AllOfSchema
 
 class JsonProcessorImpl constructor(
     private val jsonSchemaParser: JsonParser,
