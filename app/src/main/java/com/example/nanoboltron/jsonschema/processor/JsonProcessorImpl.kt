@@ -10,7 +10,9 @@ import com.example.nanoboltron.jsonschema.parser.JsonNode
 import com.example.nanoboltron.jsonschema.parser.JsonParser
 import com.example.nanoboltron.jsonschema.parser.NodeTraverser
 import com.example.nanoboltron.jsonschema.parser.UiDataNode
+import com.example.nanoboltron.jsonschema.parser.parsers.WalkParser
 import com.example.nanoboltron.jsonschema.parser.printUiTree
+import com.github.erosb.jsonsKema.AllOfSchema
 
 class JsonProcessorImpl constructor(
     private val jsonSchemaParser: JsonParser,
@@ -28,10 +30,10 @@ class JsonProcessorImpl constructor(
         val nodes = jsonSchemaParser.parse(jsonSchemaString)
         if (nodes != null && nodes is DescriptorNode) {
             Log.d("JsonProcessor", "✅ Schema loaded successfully")
-            /*traverser.forEachNode(nodes) { node, path, key, depth ->
+            traverser.forEachNode(nodes) { node, path, key, depth ->
                 Log.d("JsonProcessor", "🔍 Node at path: $path, key: $key, depth: $depth")
-            }*/
-            traverser
+            }
+            /*traverser
                 .findAllAndTransform(
                     rootNode = nodes,
                     predicate = { node, path, key, depth ->
@@ -44,7 +46,7 @@ class JsonProcessorImpl constructor(
                 )
                 .forEach {
                     Log.d("NODE", it.toString())
-                }
+                }*/
 
             // Perform complete schema analysis with one simple call
             //schemaAnalyzer.performCompleteAnalysis(nodes, name, "JsonProcessor")

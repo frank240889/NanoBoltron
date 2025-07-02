@@ -45,6 +45,7 @@ dependencies {
     implementation(libs.moshi.kotlin)
     implementation(libs.moshi.adapters)
     implementation(libs.json.skema)
+    implementation(libs.json.schema.validator)
     implementation(libs.androidx.foundation)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

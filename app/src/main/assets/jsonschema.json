@@ -1,89 +1,143 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.com/schemas/user-system-inlined.schema.json",
-  "title": "UserSystem",
-  "type": "object",
-  "required": ["users", "metadata"],
-  "properties": {
-    "metadata": {
+  "definitions": {
+    "Thing": {
       "type": "object",
       "properties": {
-        "version": {
+        "name": {
           "type": "string",
-          "pattern": "^v\\d+\\.\\d+\\.\\d+$"
-        },
-        "generatedAt": {
-          "type": "string",
-          "format": "date-time"
+          "default": "Default name"
         }
-      },
-      "required": ["version"]
-    },
-    "users": {
+      }
+    }
+  },
+  "type": "object",
+  "properties": {
+    "listOfStrings": {
       "type": "array",
-      "minItems": 1,
+      "title": "A list of strings",
       "items": {
-        "allOf": [
-          {
-            "type": "object",
-            "required": ["id", "email"],
-            "properties": {
-              "id": {
-                "type": "string",
-                "pattern": "^[a-f0-9]{24}$"
-              },
-              "email": {
-                "type": "string",
-                "format": "email"
-              },
-              "role": {
-                "type": "string",
-                "enum": ["admin", "user", "guest"]
-              }
-            }
-          },
-          {
-            "oneOf": [
-              {
-                "type": "object",
-                "properties": {
-                  "role": { "const": "admin" },
-                  "adminSettings": {
-                    "type": "object",
-                    "required": ["accessLevel"],
-                    "properties": {
-                      "accessLevel": {
-                        "type": "integer",
-                        "minimum": 1,
-                        "maximum": 10
-                      }
-                    }
-                  }
-                },
-                "required": ["adminSettings"]
-              },
-              {
-                "type": "object",
-                "properties": {
-                  "role": { "const": "user" },
-                  "preferences": {
-                    "type": "object",
-                    "properties": {
-                      "theme": {
-                        "type": "string",
-                        "enum": ["light", "dark"]
-                      },
-                      "language": {
-                        "type": "string",
-                        "minLength": 2
-                      }
-                    }
-                  }
-                }
-              }
-            ]
-          }
+        "type": "string",
+        "default": "bazinga"
+      }
+    },
+    "multipleChoicesList": {
+      "type": "array",
+      "title": "A multiple choices list",
+      "items": {
+        "type": "string",
+        "enum": [
+          "foo",
+          "bar",
+          "fuzz",
+          "qux"
         ]
+      },
+      "uniqueItems": true
+    },
+    "fixedItemsList": {
+      "type": "array",
+      "title": "A list of fixed items",
+      "items": [
+        {
+          "title": "A string value",
+          "type": "string",
+          "default": "lorem ipsum"
+        },
+        {
+          "title": "a boolean value",
+          "type": "boolean"
+        }
+      ],
+      "additionalItems": {
+        "title": "Additional item",
+        "type": "number"
+      }
+    },
+    "minItemsList": {
+      "type": "array",
+      "title": "A list with a minimal number of items",
+      "minItems": 3,
+      "items": {
+        "$ref": "#/definitions/Thing"
+      }
+    },
+    "defaultsAndMinItems": {
+      "type": "array",
+      "title": "List and item level defaults",
+      "minItems": 5,
+      "default": [
+        "carp",
+        "trout",
+        "bream"
+      ],
+      "items": {
+        "type": "string",
+        "default": "unidentified"
+      }
+    },
+    "nestedList": {
+      "type": "array",
+      "title": "Nested list",
+      "items": {
+        "type": "array",
+        "title": "Inner list",
+        "items": {
+          "type": "string",
+          "default": "lorem ipsum"
+        }
+      }
+    },
+    "unorderable": {
+      "title": "Unorderable items",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "default": "lorem ipsum"
+      }
+    },
+    "copyable": {
+      "title": "Copyable items",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "default": "lorem ipsum"
+      }
+    },
+    "unremovable": {
+      "title": "Unremovable items",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "default": "lorem ipsum"
+      }
+    },
+    "noToolbar": {
+      "title": "No add, remove and order buttons",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "default": "lorem ipsum"
+      }
+    },
+    "fixedNoToolbar": {
+      "title": "Fixed array without buttons",
+      "type": "array",
+      "items": [
+        {
+          "title": "A number",
+          "type": "number",
+          "default": 42
+        },
+        {
+          "title": "A boolean",
+          "type": "boolean",
+          "default": false
+        }
+      ],
+      "additionalItems": {
+        "title": "A string",
+        "type": "string",
+        "default": "lorem ipsum"
       }
     }
   }
