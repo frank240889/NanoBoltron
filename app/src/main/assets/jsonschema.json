@@ -1,24 +1,32 @@
 {
-  "definitions": {
-    "Thing": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "default": "Default name"
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "array",
+  "title": "Array of Items",
+  "description": "An array containing different types of items",
+  "minItems": 1,
+  "maxItems": 10,
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100
+      },
+      "tags": {
+        "type": "array",
+        "items": {
+          "type": "string"
         }
       }
-    }
-  },
-  "type": "object",
-  "properties": {
-    "listOfStrings": {
-      "type": "array",
-      "title": "A list of strings",
-      "items": {
-        "type": "string",
-        "default": "bazinga"
-      }
-    }
+    },
+    "required": [
+      "id",
+      "name"
+    ]
   }
 }
