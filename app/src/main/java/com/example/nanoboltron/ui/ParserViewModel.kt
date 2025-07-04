@@ -39,8 +39,9 @@ class ParserViewModel : ViewModel() {
     fun loadJsonSchema(context: Context) {
         val jsonSchemaLoader = JsonLoader(context)
         val jsonSchemaString = jsonSchemaLoader.loadJson("jsonschema.json")
+        val jsonDataString = jsonSchemaLoader.loadJson("jsondata.json")
         val jsonparser: JsonParser = WalkParser(context)
-        jsonparser.parse(jsonSchemaString)
+        jsonparser.parse(jsonDataString)
         /*walker.walk(jsonSchemaString) {
             Log.d("WalkerEvent", it.toString())
         }*/

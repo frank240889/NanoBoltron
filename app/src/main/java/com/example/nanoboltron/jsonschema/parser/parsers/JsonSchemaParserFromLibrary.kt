@@ -6,6 +6,7 @@ import com.networknt.schema.JsonSchema
 
 class JsonSchemaParserFromLibrary: JsonParser {
     override fun parse(json: String): JsonNode? {
- 
+
+        return null
     }
 }

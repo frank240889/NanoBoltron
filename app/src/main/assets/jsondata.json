@@ -13,5 +13,13 @@
     "tags": [
       "tag3"
     ]
+  },
+  {
+    "id": 3,
+    "name": "Third Item",
+    "tags": [
+      "tag4",
+      "tag5"
+    ]
   }
 ]
