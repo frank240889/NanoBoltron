@@ -10,9 +10,10 @@ import com.example.nanoboltron.jsonschema.parser.JsonDataParser
 import com.example.nanoboltron.jsonschema.parser.JsonParser
 import com.example.nanoboltron.jsonschema.parser.JsonSchemaParser
 import com.example.nanoboltron.jsonschema.parser.parsers.WalkParser
-import com.example.nanoboltron.jsonschema.parser.printUiTree
 import com.example.nanoboltron.jsonschema.processor.JsonProcessorImpl
 import com.example.nanoboltron.jsonschema.validation.FieldDataHandlerImpl
+import com.example.nanoboltron.jsonschema.walker.JsonSchemaPropertiesWalker
+import com.example.nanoboltron.jsonschema.walker.JsonWalkerImpl
 import com.example.nanoboltron.jsonschema.walker.Walker
 import kotlinx.coroutines.launch
 
@@ -41,7 +42,18 @@ class ParserViewModel : ViewModel() {
         val jsonSchemaString = jsonSchemaLoader.loadJson("jsonschema.json")
         val jsonDataString = jsonSchemaLoader.loadJson("jsondata.json")
         val jsonparser: JsonParser = WalkParser(context)
-        jsonparser.parse(jsonDataString)
+        val jsonWalker: Walker = JsonWalkerImpl()
+        jsonWalker
+            .nodes(jsonSchemaString)
+            .forEach { node ->
+                Log.e("node name: ${node.key}", "path: ${node.path}, is in root node: ${node.path == null}")
+            }
+
+        /*jsonWalker.walk(jsonSchemaString) {
+            Log.d("WalkerEvent", it.toString())
+        }*/
+
+        //jsonparser.parse(jsonDataString)
         /*walker.walk(jsonSchemaString) {
             Log.d("WalkerEvent", it.toString())
         }*/

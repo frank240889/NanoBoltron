@@ -23,9 +23,12 @@ internal const val PROPERTIES = "properties"
 internal const val STRING_NODE = "string"
 internal const val NUMBER_NODE = "number"
 internal const val INTEGER_NODE = "integer"
+internal const val LONG_NODE = "long"
 internal const val BOOLEAN_NODE = "boolean"
 internal const val OBJECT_NODE = "object"
 internal const val ARRAY_NODE = "array"
+internal const val UNTYPED_NULL_NODE = "null"
+internal const val UNDEFINED_NODE = "undefined"
 
 /**
  * UI types

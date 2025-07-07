@@ -8,7 +8,7 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 
-class JsonSchemaWalker: Walker {
+class JsonSchemaWalker : Walker {
     private val moshi = Moshi.Builder().build()
     private val mapAdapter: JsonAdapter<Map<String, Any?>> = moshi.adapter(
         Types.newParameterizedType(Map::class.java, String::class.java, Any::class.java)
@@ -19,7 +19,7 @@ class JsonSchemaWalker: Walker {
         onEvent: (WalkerEvent) -> Unit
     ) {
         onEvent(WalkerEvent.OnStartWalking)
-        
+
         try {
             val jsonMap = mapAdapter.fromJson(json)
             if (jsonMap != null) {
@@ -31,13 +31,13 @@ class JsonSchemaWalker: Walker {
         } catch (e: Exception) {
             // Handle parsing errors gracefully
         }
-        
+
         onEvent(WalkerEvent.OnEndWalking)
     }
-    
+
     private fun walkNode(node: JsonNode, onEvent: (WalkerEvent) -> Unit) {
-        onEvent(WalkerEvent.OnTraversingNode(node))
-        
+        onEvent(WalkerEvent.OnTraversingNode(null, node, null, true))
+
         // Traverse child nodes based on node type
         when (node) {
             is DescriptorNode.GroupNode -> {
@@ -45,11 +45,13 @@ class JsonSchemaWalker: Walker {
                     walkNode(childNode, onEvent)
                 }
             }
+
             is DescriptorNode.CompositionNode -> {
                 node.schemas.forEach { childSchema ->
                     walkNode(childSchema, onEvent)
                 }
             }
+
             is DescriptorNode.ConditionalNode -> {
                 node.ifSchema?.let { walkNode(it, onEvent) }
                 node.thenSchema?.let { walkNode(it, onEvent) }
@@ -57,10 +59,8 @@ class JsonSchemaWalker: Walker {
             }
             // Leaf nodes (StringNode, NumberNode, BooleanNode) have no children
         }
-        
-        onEvent(WalkerEvent.OnExitNode(node))
     }
-    
+
     private fun parseSchemaNode(
         jsonMap: Map<String, Any?>,
         key: String? = null,
@@ -69,7 +69,7 @@ class JsonSchemaWalker: Walker {
         val type = jsonMap["type"] as? String
         val title = jsonMap["title"] as? String
         val description = jsonMap["description"] as? String
-        
+
         // Handle composition schemas (allOf, anyOf, oneOf)
         when {
             jsonMap.containsKey("allOf") -> {
@@ -84,6 +84,7 @@ class JsonSchemaWalker: Walker {
                     schemas = schemas
                 )
             }
+
             jsonMap.containsKey("anyOf") -> {
                 val schemas = parseCompositionSchemas(jsonMap["anyOf"], key, path)
                 return DescriptorNode.CompositionNode(
@@ -96,6 +97,7 @@ class JsonSchemaWalker: Walker {
                     schemas = schemas
                 )
             }
+
             jsonMap.containsKey("oneOf") -> {
                 val schemas = parseCompositionSchemas(jsonMap["oneOf"], key, path)
                 return DescriptorNode.CompositionNode(
@@ -109,17 +111,18 @@ class JsonSchemaWalker: Walker {
                 )
             }
         }
-        
+
         // Handle conditional schemas (if-then-else)
         if (jsonMap.containsKey("if")) {
-            val ifSchema = parseSchemaNode(jsonMap["if"] as? Map<String, Any?> ?: emptyMap(), null, path)
-            val thenSchema = jsonMap["then"]?.let { 
+            val ifSchema =
+                parseSchemaNode(jsonMap["if"] as? Map<String, Any?> ?: emptyMap(), null, path)
+            val thenSchema = jsonMap["then"]?.let {
                 parseSchemaNode(it as? Map<String, Any?> ?: emptyMap(), null, path)
             }
             val elseSchema = jsonMap["else"]?.let {
                 parseSchemaNode(it as? Map<String, Any?> ?: emptyMap(), null, path)
             }
-            
+
             return DescriptorNode.ConditionalNode(
                 key = key,
                 path = path,
@@ -130,7 +133,7 @@ class JsonSchemaWalker: Walker {
                 elseSchema = elseSchema
             )
         }
-        
+
         return when (type) {
             "object" -> parseObjectNode(jsonMap, key, path)
             "string" -> parseStringNode(jsonMap, key, path)
@@ -151,10 +154,11 @@ class JsonSchemaWalker: Walker {
                     )
                 }
             }
+
             else -> null
         }
     }
-    
+
     private fun parseObjectNode(
         jsonMap: Map<String, Any?>,
         key: String?,
@@ -165,12 +169,12 @@ class JsonSchemaWalker: Walker {
         val description = jsonMap["description"] as? String
         val readOnly = jsonMap["readOnly"] as? Boolean
         val writeOnly = jsonMap["writeOnly"] as? Boolean
-        
+
         val childNodes = properties.mapNotNull { (propKey, propValue) ->
             val propPath = if (path != null) "$path.$propKey" else propKey
             parseSchemaNode(propValue as? Map<String, Any?> ?: emptyMap(), propKey, propPath)
         }
-        
+
         return DescriptorNode.GroupNode(
             key = key,
             path = path,
@@ -181,7 +185,7 @@ class JsonSchemaWalker: Walker {
             nodes = childNodes
         )
     }
-    
+
     private fun parseStringNode(
         jsonMap: Map<String, Any?>,
         key: String?,
@@ -201,7 +205,7 @@ class JsonSchemaWalker: Walker {
             contentEncoding = jsonMap["contentEncoding"] as? String
         )
     }
-    
+
     private fun parseNumberNode(
         jsonMap: Map<String, Any?>,
         key: String?,
@@ -219,7 +223,7 @@ class JsonSchemaWalker: Walker {
             multipleOf = jsonMap["multipleOf"] as? Number
         )
     }
-    
+
     private fun parseBooleanNode(
         jsonMap: Map<String, Any?>,
         key: String?,
@@ -234,7 +238,7 @@ class JsonSchemaWalker: Walker {
             readOnly = jsonMap["readOnly"] as? Boolean
         )
     }
-    
+
     private fun parseArrayNode(
         jsonMap: Map<String, Any?>,
         key: String?,
@@ -244,17 +248,21 @@ class JsonSchemaWalker: Walker {
         val prefixItems = jsonMap["prefixItems"] as? List<*>
         val title = jsonMap["title"] as? String
         val description = jsonMap["description"] as? String
-        
+
         val childNodes = mutableListOf<DescriptorNode>()
-        
+
         // Handle prefixItems (tuple validation)
         prefixItems?.forEachIndexed { index, item ->
             val itemPath = if (path != null) "$path[$index]" else "[$index]"
-            parseSchemaNode(item as? Map<String, Any?> ?: emptyMap(), index.toString(), itemPath)?.let {
+            parseSchemaNode(
+                item as? Map<String, Any?> ?: emptyMap(),
+                index.toString(),
+                itemPath
+            )?.let {
                 childNodes.add(it)
             }
         }
-        
+
         // Handle items (array validation)
         if (items != null) {
             val itemPath = if (path != null) "$path[*]" else "[*]"
@@ -262,7 +270,7 @@ class JsonSchemaWalker: Walker {
                 childNodes.add(it)
             }
         }
-        
+
         return DescriptorNode.GroupNode(
             key = key,
             path = path,
@@ -272,7 +280,7 @@ class JsonSchemaWalker: Walker {
             nodes = childNodes
         )
     }
-    
+
     private fun parseCompositionSchemas(
         compositionValue: Any?,
         key: String?,
