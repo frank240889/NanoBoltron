@@ -23,7 +23,7 @@ sealed class WalkerEvent {
         val key: String?,
         val value: Any?,
         val path: String?,
-        val isInRootNode: Boolean
+        val isInRoot: Boolean
     ) : WalkerEvent()
 
     data object OnEndWalking : WalkerEvent()
@@ -35,5 +35,6 @@ data class Node(
     val key: String?,
     val value: Any?,
     val path: String?,
+    val isInRoot: Boolean,
     val children: List<Node>? = null
 ): JsonNode

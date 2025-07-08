@@ -46,9 +46,7 @@ class JsonSchemaRootNodeWalker @Inject constructor(
     ) {
         walker.walk(json) {
             if (it is WalkerEvent.OnTraversingNode) {
-                if (it.isInRootNode) {
-                    onEvent(it)
-                }
+                onEvent(it)
             }
         }
     }

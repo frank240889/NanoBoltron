@@ -36,7 +36,7 @@ class JsonSchemaWalker : Walker {
     }
 
     private fun walkNode(node: JsonNode, onEvent: (WalkerEvent) -> Unit) {
-        onEvent(WalkerEvent.OnTraversingNode(null, node, null, true))
+        onEvent(WalkerEvent.OnTraversingNode(null, node, null, false))
 
         // Traverse child nodes based on node type
         when (node) {

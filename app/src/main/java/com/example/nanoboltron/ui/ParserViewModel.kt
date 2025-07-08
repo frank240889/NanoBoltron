@@ -15,6 +15,7 @@ import com.example.nanoboltron.jsonschema.validation.FieldDataHandlerImpl
 import com.example.nanoboltron.jsonschema.walker.JsonSchemaPropertiesWalker
 import com.example.nanoboltron.jsonschema.walker.JsonWalkerImpl
 import com.example.nanoboltron.jsonschema.walker.Walker
+import com.example.nanoboltron.jsonschema.walker.WalkerEvent
 import kotlinx.coroutines.launch
 
 class ParserViewModel : ViewModel() {
@@ -44,9 +45,10 @@ class ParserViewModel : ViewModel() {
         val jsonparser: JsonParser = WalkParser(context)
         val jsonWalker: Walker = JsonWalkerImpl()
         jsonWalker
-            .nodes(jsonSchemaString)
-            .forEach { node ->
-                Log.e("node name: ${node.key}", "path: ${node.path}, is in root node: ${node.path == null}")
+            .treeNodes(jsonSchemaString)
+            .forEach { event ->
+                Log.e("node name: ${event.key}",
+                    "path: ${event.path}, is in root node: ${event.isInRoot}, children: ${event.children}")
             }
 
         /*jsonWalker.walk(jsonSchemaString) {

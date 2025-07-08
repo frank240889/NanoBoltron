@@ -51,8 +51,9 @@ class JsonWalkerImpl : Walker {
                     Node(
                         type = inferNodeType(event.value),
                         key = event.key,
-                        value = event.value,
-                        path = event.path
+                        value = null,
+                        path = event.path,
+                        isInRoot = event.isInRoot
                     )
                 )
             }
@@ -62,7 +63,7 @@ class JsonWalkerImpl : Walker {
 
     override fun treeNodes(json: String): List<Node> {
         val nodes = nodes(json)
-        /*val pathToNode = nodes.associateBy { it.path }
+        val pathToNode = nodes.associateBy { it.path }
             .toMutableMap()
 
         nodes.sortedByDescending { it.path?.split(".")?.size ?: 0 }.forEach { node ->
@@ -79,8 +80,9 @@ class JsonWalkerImpl : Walker {
             }
         }
 
-        return pathToNode.values*/
-        return emptyList()
+        return pathToNode.values
+            .filter { it.isInRoot }
+
     }
 
     private fun parse(json: String): Map<String, Any?> {
@@ -91,9 +93,8 @@ class JsonWalkerImpl : Walker {
         key: Key?,
         value: Any?,
         path: Path?,
-        isInRootNode: Boolean? = null
     ) {
-        val childPath = buildChildPath(key, path, isInRootNode)
+        val childPath = buildChildPath(key, path)
 
         when (value) {
             is Map<*, *> -> {
@@ -116,23 +117,23 @@ class JsonWalkerImpl : Walker {
         value: Map<String, Any?>,
         path: Path?,
     ) {
-        val isInRootNode = path == null
+        val isInRoot = path == null
         value.entries.forEach { entry ->
             val childKey = entry.key
             val childValue = entry.value
+            val childPath = buildChildPath(childKey, path)
             onEvent.invoke(
                 WalkerEvent.OnTraversingNode(
                     key = childKey,
                     value = value,
-                    path = path,
-                    isInRootNode = isInRootNode,
+                    path = childPath,
+                    isInRoot = isInRoot
                 )
             )
             walkNode(
                 key = childKey,
                 value = childValue,
-                path = path,
-                isInRootNode = isInRootNode
+                path = path
             )
         }
     }
@@ -141,37 +142,31 @@ class JsonWalkerImpl : Walker {
         value: List<Any?>,
         path: String?,
     ) {
-        val isInRootNode = path == null
+        val isInRoot = path == null
         value.forEachIndexed { index, childValue ->
             val childKey = "[$index]"
+            val childPath = buildChildPath(childKey, path)
             onEvent.invoke(
                 WalkerEvent.OnTraversingNode(
                     key = childKey,
                     value = value,
-                    path = path,
-                    isInRootNode = isInRootNode,
+                    path = childPath,
+                    isInRoot = isInRoot
                 )
             )
             walkNode(
                 key = childKey,
                 value = childValue,
-                path = path,
-                isInRootNode = path == null
+                path = path
             )
         }
-    }
-
-    private fun isParentNode(value: Any?): Boolean {
-        return value is Map<*, *> || value is List<*>
     }
 
     private fun buildChildPath(
         key: Key?,
         parentPath: String?,
-        isInRootNode: Boolean?
     ): String? {
         return when {
-            isInRootNode == true -> null
             parentPath == null && key != null -> key
             parentPath != null && key != null -> "$parentPath.$key"
             else -> parentPath
