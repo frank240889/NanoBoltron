@@ -179,7 +179,7 @@ class SchemaAnalyzer {
         val complexityMetrics = getComplexityMetrics(analysis)
         Log.d(tag, "📊 Complexity Metrics:")
         Log.d(tag, "   Complexity Score: ${complexityMetrics.complexityScore}")
-        Log.d(tag, "   Leaf Node Ratio: ${complexityMetrics.leafNodeRatio}")
+        Log.d(tag, "   Leaf Primitive Ratio: ${complexityMetrics.leafNodeRatio}")
         Log.d(tag, "   Average Depth: ${complexityMetrics.averageDepth}")
         Log.d(tag, "   Composition Complexity: ${complexityMetrics.compositionComplexity}")
         Log.d(tag, "   Conditional Complexity: ${complexityMetrics.conditionalComplexity}")

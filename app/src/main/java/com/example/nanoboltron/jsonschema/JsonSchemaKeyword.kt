@@ -39,6 +39,7 @@ internal const val REPEATABLE_GROUP = "repeatable"
 /**
  * Subschemas
  */
+internal const val COMPOSITION_NODE = "composition"
 internal const val ANY_OF = "anyOf"
 internal const val ONE_OF = "oneOf"
 internal const val ALL_OF = "allOf"

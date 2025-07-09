@@ -1,7 +1,10 @@
 package com.example.nanoboltron.jsonschema.parser.parsers
 
-import com.example.nanoboltron.jsonschema.BOOLEAN_NODE
-import com.example.nanoboltron.jsonschema.parser.Key
+import com.example.nanoboltron.jsonschema.DEFAULT
+import com.example.nanoboltron.jsonschema.DESCRIPTION
+import com.example.nanoboltron.jsonschema.READ_ONLY
+import com.example.nanoboltron.jsonschema.TITLE
+import com.example.nanoboltron.jsonschema.core.Key
 
 class BooleanDescriptorParser : NodeParser {
     override fun parse(
@@ -15,10 +18,10 @@ class BooleanDescriptorParser : NodeParser {
             key = key,
             path = path,
             type = type,
-            title = value["title"] as? String,
-            description = value["description"] as? String,
-            default = value["default"] as? Boolean,
-            readOnly = value["readOnly"] as? Boolean
+            title = value[TITLE] as? String,
+            description = value[DESCRIPTION] as? String,
+            default = value[DEFAULT] as? Boolean,
+            readOnly = value[READ_ONLY] as? Boolean
         )
     }
 }

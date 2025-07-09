@@ -1,6 +1,6 @@
 package com.example.nanoboltron.jsonschema.parser.parsers
 
-import com.example.nanoboltron.jsonschema.parser.Key
+import com.example.nanoboltron.jsonschema.core.Key
 
 class StringDescriptorParser : NodeParser {
     override fun parse(

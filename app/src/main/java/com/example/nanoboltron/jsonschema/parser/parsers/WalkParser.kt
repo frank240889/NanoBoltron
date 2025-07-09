@@ -3,7 +3,7 @@ package com.example.nanoboltron.jsonschema.parser.parsers
 import android.content.Context
 import android.util.Log
 import com.example.nanoboltron.jsonschema.core.JsonNode
-import com.example.nanoboltron.jsonschema.parser.JsonParser
+import com.example.nanoboltron.jsonschema.parser.Parser
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.networknt.schema.JsonSchemaFactory
 import com.networknt.schema.SchemaValidatorsConfig
@@ -17,7 +17,7 @@ import com.networknt.schema.walk.WalkFlow
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
-class WalkParser(private val context: Context) : JsonParser {
+class WalkParser(private val context: Context) : Parser {
     private val TAG = "WalkParser"
 
     override fun parse(json: String): JsonNode? {
@@ -74,8 +74,8 @@ class UiNodeBuilderListener : JsonSchemaWalkListener {
 
         Log.d(tag, "=== On Walk Start ===")
         Log.d(tag, "Schema Path: ${walkEvent.schemaPath}")
-        Log.d(tag, "Schema Node: ${walkEvent.schemaNode?.get(walkEvent.keyWordName)}")
-        Log.d(tag, "Node: ${walkEvent.node.get(walkEvent.keyWordName)}")
+        Log.d(tag, "Schema Primitive: ${walkEvent.schemaNode?.get(walkEvent.keyWordName)}")
+        Log.d(tag, "Primitive: ${walkEvent.node.get(walkEvent.keyWordName)}")
         Log.d(tag, "Schema field key: ${walkEvent.keyWordName}")
 
         // Special debug for items keyword

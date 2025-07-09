@@ -22,6 +22,7 @@ import com.example.nanoboltron.jsonschema.THEN
 import com.example.nanoboltron.jsonschema.TITLE
 import com.example.nanoboltron.jsonschema.TYPE
 import com.example.nanoboltron.jsonschema.WRITE_ONLY
+import com.example.nanoboltron.jsonschema.core.Key
 import com.example.nanoboltron.jsonschema.parser.parsers.BooleanDescriptorParser
 import com.example.nanoboltron.jsonschema.parser.parsers.DescriptorNode
 import com.example.nanoboltron.jsonschema.parser.parsers.NumberDescriptorParser
@@ -29,7 +30,7 @@ import com.example.nanoboltron.jsonschema.parser.parsers.StringDescriptorParser
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 
-class JsonSchemaParser : JsonParser {
+class JsonSchemaParser : Parser {
     private val moshi = Moshi.Builder().build()
     private val type =
         Types.newParameterizedType(Map::class.java, String::class.java, Any::class.java)

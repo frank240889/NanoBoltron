@@ -1,6 +1,7 @@
 package com.example.nanoboltron.jsonschema.parser
 
 import com.example.nanoboltron.jsonschema.core.JsonNode
+import com.example.nanoboltron.jsonschema.core.Key
 
 sealed class FormDataNode : JsonNode {
     abstract val key: Key?

@@ -1,7 +1,7 @@
 package com.example.nanoboltron.jsonschema.datamanager
 
 import com.example.nanoboltron.jsonschema.parser.UiDataNode
-import com.example.nanoboltron.jsonschema.parser.Key
+import com.example.nanoboltron.jsonschema.core.Key
 
 interface DataBinder {
     fun setData(data: String)

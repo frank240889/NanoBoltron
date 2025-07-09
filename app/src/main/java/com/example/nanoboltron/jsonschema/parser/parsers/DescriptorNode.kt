@@ -1,11 +1,14 @@
 package com.example.nanoboltron.jsonschema.parser.parsers
 
+import com.example.nanoboltron.jsonschema.ALL_OF
 import com.example.nanoboltron.jsonschema.BOOLEAN_NODE
+import com.example.nanoboltron.jsonschema.COMPOSITION_NODE
 import com.example.nanoboltron.jsonschema.GROUP
 import com.example.nanoboltron.jsonschema.NUMBER_NODE
 import com.example.nanoboltron.jsonschema.STRING_NODE
 import com.example.nanoboltron.jsonschema.core.JsonNode
-import com.example.nanoboltron.jsonschema.parser.Key
+import com.example.nanoboltron.jsonschema.core.Key
+import com.example.nanoboltron.jsonschema.core.Type
 
 /**
  * The next descriptor classes convey the idea of how should the node be represented in the UI according
@@ -14,16 +17,7 @@ import com.example.nanoboltron.jsonschema.parser.Key
  */
 sealed class DescriptorNode : JsonNode {
 
-    /**
-     * The key of the node. Useful to match it against the TypedUISchema. Its value is null for the
-     * root node.
-     */
-    abstract val key: Key?
-    /**
-     * The path to get to the node in the format path.to.the.node where every word between the dots
-     * represent one level down in the data structure, commonly a map, null indicates the root node.
-     */
-    abstract val path: String?
+    abstract val jsonSchemaType: Type
     abstract val title: String?
     abstract val description: String?
     /**
@@ -100,6 +94,7 @@ sealed class DescriptorNode : JsonNode {
      * Represents a section/group of fields, generally the root node belongs to this type
      */
     data class GroupNode(
+        override val jsonSchemaType: Type = GROUP,
         override val key: Key? = null,
         override val path: String? = null,
         override val type: String = GROUP,
@@ -120,6 +115,7 @@ sealed class DescriptorNode : JsonNode {
      * null
      */
     data class StringNode(
+        override val jsonSchemaType: Type = STRING_NODE,
         override val key: Key? = null,
         override val path: String? = null,
         override val type: String = STRING_NODE,
@@ -143,6 +139,7 @@ sealed class DescriptorNode : JsonNode {
      * null
      */
     data class NumberNode(
+        override val jsonSchemaType: Type = NUMBER_NODE,
         override val key: Key? = null,
         override val path: String? = null,
         override val type: String = NUMBER_NODE,
@@ -166,6 +163,7 @@ sealed class DescriptorNode : JsonNode {
      * Represents a single 2-state component.
      */
     data class BooleanNode(
+        override val jsonSchemaType: Type = BOOLEAN_NODE,
         override val key: Key? = null,
         override val path: String? = null,
         override val type: String = BOOLEAN_NODE,
@@ -179,6 +177,7 @@ sealed class DescriptorNode : JsonNode {
      * Represents a composition of multiple schemas using allOf, anyOf, or oneOf
      */
     data class CompositionNode(
+        override val jsonSchemaType: Type = COMPOSITION_NODE,
         override val key: Key? = null,
         override val path: String? = null,
         override val type: String,
@@ -192,6 +191,7 @@ sealed class DescriptorNode : JsonNode {
      * Represents conditional schema logic using if-then-else
      */
     data class ConditionalNode(
+        override val jsonSchemaType: Type,
         override val key: Key? = null,
         override val path: String? = null,
         override val type: String = "conditional",

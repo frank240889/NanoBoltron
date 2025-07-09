@@ -1,17 +1,21 @@
 package com.example.nanoboltron.jsonschema.core
 
 /**
- * This class represents a JSON Schema node [https://json-schema.org/understanding-json-schema/reference/type]
- * They contain the type of the node and its properties that can be use to describe how the UI
- * will be rendered. The current properties could be overridden by the TypedUISchema, which is the
- * equivalent of JsonUISchema but for mobile. The allOf, anyOf and oneOf are a subtype of this
- * interface as they represent a list of JsonSchemaNode.
- * Since Kotlin is a strong typed language, undefined properties from JS will be treated as typed-null
- * since we don't have an UNDEFINED type.
+ * This class represents a JSON node.
  */
 interface JsonNode {
     /**
-     * The type of node, check [com.example.nanoboltron.jsonschema.parser.parsers.DescriptorNode].
+     * The native type of node, it can be an array, a boolean, a number, an object, a string or null.
      */
-    val type: String?
+    val type: Type?
+    /**
+     * The key of the node. Usually represents the name of the node.
+     */
+    val key: Key?
+    /**
+     * The path to get to the node in the format path.to.the.node where every word between the dots
+     * represent one level down in the data structure, commonly a map, null indicates the node is in
+     * the root node.
+     */
+    val path: Path?
 }

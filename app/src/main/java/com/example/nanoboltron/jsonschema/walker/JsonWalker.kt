@@ -9,13 +9,14 @@ import com.example.nanoboltron.jsonschema.NUMBER_NODE
 import com.example.nanoboltron.jsonschema.OBJECT_NODE
 import com.example.nanoboltron.jsonschema.STRING_NODE
 import com.example.nanoboltron.jsonschema.UNDEFINED_NODE
-import com.example.nanoboltron.jsonschema.parser.Key
-import com.example.nanoboltron.jsonschema.parser.Path
+import com.example.nanoboltron.jsonschema.core.Native
+import com.example.nanoboltron.jsonschema.core.Key
+import com.example.nanoboltron.jsonschema.core.Path
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 
-class JsonWalkerImpl : Walker {
+class JsonWalker : Walker {
     private val moshi = Moshi.Builder().build()
     private val type =
         Types.newParameterizedType(Map::class.java, String::class.java, Any::class.java)
@@ -43,46 +44,22 @@ class JsonWalkerImpl : Walker {
         }
     }
 
-    override fun nodes(json: String): List<Node> {
-        val data = mutableListOf<Node>()
+    override fun flatListNodes(json: String): List<FlatNode> {
+        val data = mutableListOf<FlatNode>()
         walk(json) { event ->
             if (event is WalkerEvent.OnTraversingNode) {
                 data.add(
-                    Node(
-                        type = inferNodeType(event.value),
+                    FlatNode(
                         key = event.key,
-                        value = null,
+                        type = event.type,
                         path = event.path,
-                        isInRoot = event.isInRoot
+                        isInRoot = event.isInRoot,
+                        data = event.value
                     )
                 )
             }
         }
         return data
-    }
-
-    override fun treeNodes(json: String): List<Node> {
-        val nodes = nodes(json)
-        val pathToNode = nodes.associateBy { it.path }
-            .toMutableMap()
-
-        nodes.sortedByDescending { it.path?.split(".")?.size ?: 0 }.forEach { node ->
-            val parentPath = node.path?.substringBeforeLast('.', missingDelimiterValue = "")
-            if (parentPath.isNullOrBlank()) return@forEach
-
-            val parent = pathToNode[parentPath]
-            if (parent != null) {
-                val updatedParent = parent.copy(
-                    children = (parent.children.orEmpty() + node)
-                        .sortedBy { it.key } // opcional, por orden
-                )
-                pathToNode[parentPath] = updatedParent
-            }
-        }
-
-        return pathToNode.values
-            .filter { it.isInRoot }
-
     }
 
     private fun parse(json: String): Map<String, Any?> {
@@ -121,12 +98,12 @@ class JsonWalkerImpl : Walker {
         value.entries.forEach { entry ->
             val childKey = entry.key
             val childValue = entry.value
-            val childPath = buildChildPath(childKey, path)
             onEvent.invoke(
                 WalkerEvent.OnTraversingNode(
+                    type = inferNodeType(childValue),
                     key = childKey,
                     value = value,
-                    path = childPath,
+                    path = path,
                     isInRoot = isInRoot
                 )
             )
@@ -145,12 +122,12 @@ class JsonWalkerImpl : Walker {
         val isInRoot = path == null
         value.forEachIndexed { index, childValue ->
             val childKey = "[$index]"
-            val childPath = buildChildPath(childKey, path)
             onEvent.invoke(
                 WalkerEvent.OnTraversingNode(
+                    type = inferNodeType(childValue),
                     key = childKey,
                     value = value,
-                    path = childPath,
+                    path = path,
                     isInRoot = isInRoot
                 )
             )
@@ -173,8 +150,8 @@ class JsonWalkerImpl : Walker {
         }
     }
 
-    private fun inferNodeType(any: Any?): String {
-        return when (any) {
+    private fun inferNodeType(value: Any?): String {
+        return when (value) {
             is Int -> INTEGER_NODE
             is String -> STRING_NODE
             is Boolean -> BOOLEAN_NODE

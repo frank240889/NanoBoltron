@@ -6,12 +6,12 @@ import com.example.nanoboltron.JsonLoader
 import com.example.nanoboltron.jsonschema.analyzer.SchemaAnalyzer
 import com.example.nanoboltron.jsonschema.parser.parsers.DescriptorNode
 import com.example.nanoboltron.jsonschema.core.JsonNode
-import com.example.nanoboltron.jsonschema.parser.JsonParser
+import com.example.nanoboltron.jsonschema.parser.Parser
 import com.example.nanoboltron.jsonschema.parser.NodeTraverser
 
 class JsonProcessorImpl constructor(
-    private val jsonSchemaParser: JsonParser,
-    private val jsonDataParser: JsonParser
+    private val jsonSchemaParser: Parser,
+    private val jsonDataParser: Parser
 ) : JsonProcessor {
     private val jsonSchemaName: String = "default"
     private val jsonDataName: String = "default"
@@ -26,7 +26,7 @@ class JsonProcessorImpl constructor(
         if (nodes != null && nodes is DescriptorNode) {
             Log.d("JsonProcessor", "✅ Schema loaded successfully")
             traverser.forEachNode(nodes) { node, path, key, depth ->
-                Log.d("JsonProcessor", "🔍 Node at path: $path, key: $key, depth: $depth")
+                Log.d("JsonProcessor", "🔍 Primitive at path: $path, key: $key, depth: $depth")
             }
             /*traverser
                 .findAllAndTransform(

@@ -5,24 +5,23 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.nanoboltron.JsonLoader
-import com.example.nanoboltron.jsonschema.JsonSchemaWalker
+import com.example.nanoboltron.jsonschema.core.Native
 import com.example.nanoboltron.jsonschema.parser.JsonDataParser
-import com.example.nanoboltron.jsonschema.parser.JsonParser
+import com.example.nanoboltron.jsonschema.parser.Parser
 import com.example.nanoboltron.jsonschema.parser.JsonSchemaParser
-import com.example.nanoboltron.jsonschema.parser.parsers.WalkParser
+import com.example.nanoboltron.jsonschema.parser.findNodeByPath
+import com.example.nanoboltron.jsonschema.parser.parsers.JsonParser
 import com.example.nanoboltron.jsonschema.processor.JsonProcessorImpl
 import com.example.nanoboltron.jsonschema.validation.FieldDataHandlerImpl
-import com.example.nanoboltron.jsonschema.walker.JsonSchemaPropertiesWalker
-import com.example.nanoboltron.jsonschema.walker.JsonWalkerImpl
+import com.example.nanoboltron.jsonschema.walker.JsonWalker
 import com.example.nanoboltron.jsonschema.walker.Walker
-import com.example.nanoboltron.jsonschema.walker.WalkerEvent
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 class ParserViewModel : ViewModel() {
     private val jsonProcessor = JsonProcessorImpl(JsonSchemaParser(), JsonDataParser())
     private val fieldDataHandler: com.example.nanoboltron.jsonschema.FieldDataHandler =
         FieldDataHandlerImpl()
-    private val walker: Walker = JsonSchemaWalker()
 
     fun setValue(path: String? = null, value: Any) {
         viewModelScope.launch {
@@ -42,36 +41,23 @@ class ParserViewModel : ViewModel() {
         val jsonSchemaLoader = JsonLoader(context)
         val jsonSchemaString = jsonSchemaLoader.loadJson("jsonschema.json")
         val jsonDataString = jsonSchemaLoader.loadJson("jsondata.json")
-        val jsonparser: JsonParser = WalkParser(context)
-        val jsonWalker: Walker = JsonWalkerImpl()
-        jsonWalker
-            .treeNodes(jsonSchemaString)
-            .forEach { event ->
-                Log.e("node name: ${event.key}",
-                    "path: ${event.path}, is in root node: ${event.isInRoot}, children: ${event.children}")
-            }
+        val jsonParser: Parser = JsonParser()
+        val jsonWalker: Walker = JsonWalker()
+        val nodes = jsonWalker
+            .flatListNodes(jsonSchemaString)
 
-        /*jsonWalker.walk(jsonSchemaString) {
-            Log.d("WalkerEvent", it.toString())
-        }*/
-
-        //jsonparser.parse(jsonDataString)
-        /*walker.walk(jsonSchemaString) {
-            Log.d("WalkerEvent", it.toString())
-        }*/
-        /*val jsonSchemaObject: JsonValue = JsonParser(jsonSchemaString).parse()
-        val schema: Schema = SchemaLoader(jsonSchemaObject).load()
-        val validator: Validator = Validator.create(
-            schema,
-            ValidatorConfig(FormatValidationPolicy.NEVER)
-        )
-        val dataString = jsonSchemaLoader.loadJson("jsondata.json")
-        val data = com.github.erosb.jsonsKema.JsonParser(dataString).parse()
-        val res = validator.validate(data)
-        val mainNode = jsonParser.parse(jsonSchemaString)
-        if (mainNode != null) {
-            printUiTree(mainNode)
-        }*/
+        val randomNode = nodes[Random.nextInt(0, nodes.lastIndex)]
+        val path = randomNode.path
+        val key = randomNode.key
+        Log.e("PATH", "PATH: $path")
+        Log.e("KEY", "KEY: $key")
+        val jsNode = jsonParser.parse(jsonSchemaString)
+        val testNode = if (jsNode is Native) {
+            jsNode.findNodeByPath(path, key)
+        } else {
+            null
+        }
+        Log.e("TEST", "testNode: $testNode")
     }
 
 }

@@ -1,17 +1,10 @@
 package com.example.nanoboltron.jsonschema.walker
 
 import com.example.nanoboltron.jsonschema.core.JsonNode
-import com.example.nanoboltron.jsonschema.parser.Key
 
 interface Walker {
     fun walk(json: String, onEvent: (WalkerEvent) -> Unit)
-    fun nodes(json: String): List<Node> {
-        return emptyList()
-    }
-
-    fun treeNodes(json: String): List<Node> {
-        return emptyList()
-    }
+    fun flatListNodes(json: String): List<JsonNode>
 }
 
 sealed class WalkerEvent {
@@ -20,6 +13,7 @@ sealed class WalkerEvent {
     data class OnParsingError(val message: String) : WalkerEvent()
     data object OnStartWalking : WalkerEvent()
     data class OnTraversingNode(
+        val type: String,
         val key: String?,
         val value: Any?,
         val path: String?,
@@ -28,13 +22,3 @@ sealed class WalkerEvent {
 
     data object OnEndWalking : WalkerEvent()
 }
-
-
-data class Node(
-    override val type: Key,
-    val key: String?,
-    val value: Any?,
-    val path: String?,
-    val isInRoot: Boolean,
-    val children: List<Node>? = null
-): JsonNode
