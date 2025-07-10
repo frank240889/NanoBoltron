@@ -12,6 +12,7 @@ import com.example.nanoboltron.jsonschema.parser.JsonParser
 import com.example.nanoboltron.jsonschema.parser.JsonSchemaParser
 import com.example.nanoboltron.jsonschema.parser.findNodeByPath
 import com.example.nanoboltron.jsonschema.parser.parsers.JsonSchemaParserImpl
+import com.example.nanoboltron.jsonschema.parser.parsers.JsonSchemaParserPlus
 import com.example.nanoboltron.jsonschema.parser.parsers.JsonStringParser
 import com.example.nanoboltron.jsonschema.processor.JsonProcessorImpl
 import com.example.nanoboltron.jsonschema.validation.FieldDataHandlerImpl
@@ -61,14 +62,15 @@ class ParserViewModel : ViewModel() {
         }
         Log.e("TEST", "testNode: $testNode")
 
-        val jsonSchemaParser: JsonParser = JsonSchemaParserImpl(jsonStringParser)
+        val jsonSchemaParser: JsonParser = JsonSchemaParserPlus()
         val anotherNode = jsonSchemaParser.parse(jsonSchemaString)
         val anotherRandomNode = nodes[Random.nextInt(0, nodes.lastIndex)]
         val anotherPath = anotherRandomNode.path
         val anotherKey = randomNode.key
+        Log.e("ANOTHER NODE", "ANOTHER NODE: $anotherNode")
         Log.e("ANOTHER PATH", "ANOTHER PATH: $anotherPath")
         Log.e("ANOTHER KEY", "ANOTHER KEY: $anotherKey")
-        val anotherTestNode = jsNode?.findNodeByPath(path, key)
+        val anotherTestNode = anotherNode?.findNodeByPath(path, key)
         Log.e("ANOTHER TEST", "anotherTestNode: $anotherTestNode")
     }
 
