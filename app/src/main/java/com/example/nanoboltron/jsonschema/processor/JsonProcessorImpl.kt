@@ -6,12 +6,12 @@ import com.example.nanoboltron.JsonLoader
 import com.example.nanoboltron.jsonschema.analyzer.SchemaAnalyzer
 import com.example.nanoboltron.jsonschema.parser.parsers.DescriptorNode
 import com.example.nanoboltron.jsonschema.core.JsonNode
-import com.example.nanoboltron.jsonschema.parser.Parser
+import com.example.nanoboltron.jsonschema.parser.JsonParser
 import com.example.nanoboltron.jsonschema.parser.NodeTraverser
 
 class JsonProcessorImpl constructor(
-    private val jsonSchemaParser: Parser,
-    private val jsonDataParser: Parser
+    private val jsonSchemaParser: JsonParser,
+    private val jsonDataParser: JsonParser
 ) : JsonProcessor {
     private val jsonSchemaName: String = "default"
     private val jsonDataName: String = "default"

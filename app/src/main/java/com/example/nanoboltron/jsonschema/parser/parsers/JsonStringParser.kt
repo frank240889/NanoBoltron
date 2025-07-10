@@ -14,13 +14,13 @@ import com.example.nanoboltron.jsonschema.core.Native.Array
 import com.example.nanoboltron.jsonschema.core.Native.Object
 import com.example.nanoboltron.jsonschema.core.Native.Primitive
 import com.example.nanoboltron.jsonschema.core.Key
-import com.example.nanoboltron.jsonschema.parser.Parser
+import com.example.nanoboltron.jsonschema.parser.JsonParser
 import com.example.nanoboltron.jsonschema.core.Path
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 
-class JsonParser: Parser {
+class JsonStringParser: JsonParser {
     private val moshi = Moshi.Builder().build()
     private val type =
         Types.newParameterizedType(Map::class.java, String::class.java, Any::class.java)
