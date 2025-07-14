@@ -21,12 +21,12 @@ import com.example.nanoboltron.jsonschema.THEN
 import com.example.nanoboltron.jsonschema.TITLE
 import com.example.nanoboltron.jsonschema.TYPE
 import com.example.nanoboltron.jsonschema.WRITE_ONLY
-import com.example.nanoboltron.jsonschema.parser.Parser
+import com.example.nanoboltron.jsonschema.parser.JsonParser
 import com.example.nanoboltron.jsonschema.core.Key
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 
-class JsonSchemaParserPlus : Parser {
+class JsonSchemaParserPlus : JsonParser {
     private val moshi = Moshi.Builder().build()
     private val type =
         Types.newParameterizedType(Map::class.java, String::class.java, Any::class.java)
@@ -198,6 +198,7 @@ class JsonSchemaParserPlus : Parser {
         val elseSchema = value[ELSE] as? Map<String, Any?>
 
         return DescriptorNode.ConditionalNode(
+            jsonSchemaType = "",
             key = key,
             path = if (path.isNullOrBlank()) null else path,
             title = value[TITLE] as? String,

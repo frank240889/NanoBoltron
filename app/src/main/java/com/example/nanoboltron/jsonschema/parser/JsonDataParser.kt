@@ -5,7 +5,7 @@ import com.example.nanoboltron.jsonschema.core.Key
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 
-class JsonDataParser : Parser {
+class JsonDataParser : JsonParser {
     private val moshi = Moshi
         .Builder()
         .build()

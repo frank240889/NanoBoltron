@@ -2,8 +2,6 @@ package com.example.nanoboltron.jsonschema.core
 
 sealed class Native: JsonNode {
     abstract val isInRoot: Boolean
-    abstract val key: String?
-    abstract val path: String?
 
     data class Primitive(
         override val type: Key,

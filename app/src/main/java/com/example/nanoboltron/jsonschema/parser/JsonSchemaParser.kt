@@ -30,7 +30,7 @@ import com.example.nanoboltron.jsonschema.parser.parsers.StringDescriptorParser
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 
-class JsonSchemaParser : Parser {
+class JsonSchemaParser : JsonParser {
     private val moshi = Moshi.Builder().build()
     private val type =
         Types.newParameterizedType(Map::class.java, String::class.java, Any::class.java)
@@ -39,8 +39,8 @@ class JsonSchemaParser : Parser {
     private val numberDescriptorParser = NumberDescriptorParser()
     private val booleanDescriptorParser = BooleanDescriptorParser()
 
-    override fun parse(schema: String): DescriptorNode? {
-        val model: Map<String, Any?> = mapAdapter.fromJson(schema) ?: mapOf()
+    override fun parse(json: String): DescriptorNode? {
+        val model: Map<String, Any?> = mapAdapter.fromJson(json) ?: mapOf()
         return parseNode(value = model, isRootNode = true)
     }
 
@@ -104,6 +104,7 @@ class JsonSchemaParser : Parser {
         val elseSchema = value[ELSE] as? Map<String, Any?>
 
         return DescriptorNode.ConditionalNode(
+            jsonSchemaType = "",
             key = key,
             path = if (path.isNullOrBlank()) null else path,
             title = value[TITLE] as? String,

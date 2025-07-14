@@ -102,6 +102,7 @@ sealed class DescriptorNode : JsonNode {
         override val description: String? = null,
         val readOnly: Boolean? = null,
         val writeOnly: Boolean? = null,
+        val enum: List<DescriptorNode>? = null,
         val nodes: List<DescriptorNode>? = null
     ) : DescriptorNode() {
         override fun toString(): String {
