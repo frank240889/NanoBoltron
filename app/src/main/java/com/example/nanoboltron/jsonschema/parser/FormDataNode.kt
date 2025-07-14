@@ -4,9 +4,6 @@ import com.example.nanoboltron.jsonschema.core.JsonNode
 import com.example.nanoboltron.jsonschema.core.Key
 
 sealed class FormDataNode : JsonNode {
-    abstract val key: Key?
-    abstract val path: String?
-
     data class StringData(
         override val type: String?,
         override val key: String?,
