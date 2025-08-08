@@ -1,4 +1,4 @@
-package com.example.nanoboltron.jsonschema
+package com.example.nanoboltron.jsonschema.datamanager
 
 /**
  * This component is in charge to update the value of certain field.

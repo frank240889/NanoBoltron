@@ -2,7 +2,7 @@ package com.example.nanoboltron.jsonschema.core
 
 import com.example.nanoboltron.jsonschema.core.Native.Array
 import com.example.nanoboltron.jsonschema.core.Native.Object
-import com.example.nanoboltron.jsonschema.parser.parsers.DescriptorNode
+import com.example.nanoboltron.jsonschema.core.DescriptorNode
 
 /**
  * Extension function to find a node by path and key in any JsonNode

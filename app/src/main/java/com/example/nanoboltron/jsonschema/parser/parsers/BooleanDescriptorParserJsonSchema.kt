@@ -4,9 +4,11 @@ import com.example.nanoboltron.jsonschema.DEFAULT
 import com.example.nanoboltron.jsonschema.DESCRIPTION
 import com.example.nanoboltron.jsonschema.READ_ONLY
 import com.example.nanoboltron.jsonschema.TITLE
+import com.example.nanoboltron.jsonschema.core.DescriptorNode
 import com.example.nanoboltron.jsonschema.core.Key
+import com.example.nanoboltron.jsonschema.parser.JsonSchemaNodeParser
 
-class BooleanDescriptorParser : NodeParser {
+class BooleanDescriptorParserJsonSchema : JsonSchemaNodeParser {
     override fun parse(
         type: String,
         key: Key?,

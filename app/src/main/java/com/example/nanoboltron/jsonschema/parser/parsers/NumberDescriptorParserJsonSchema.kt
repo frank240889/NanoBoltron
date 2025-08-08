@@ -1,8 +1,10 @@
 package com.example.nanoboltron.jsonschema.parser.parsers
 
+import com.example.nanoboltron.jsonschema.core.DescriptorNode
 import com.example.nanoboltron.jsonschema.core.Key
+import com.example.nanoboltron.jsonschema.parser.JsonSchemaNodeParser
 
-class NumberDescriptorParser : NodeParser {
+class NumberDescriptorParserJsonSchema : JsonSchemaNodeParser {
     override fun parse(
         type: String,
         key: Key?,

@@ -23,10 +23,10 @@ import com.example.nanoboltron.jsonschema.TITLE
 import com.example.nanoboltron.jsonschema.TYPE
 import com.example.nanoboltron.jsonschema.WRITE_ONLY
 import com.example.nanoboltron.jsonschema.core.Key
-import com.example.nanoboltron.jsonschema.parser.parsers.BooleanDescriptorParser
-import com.example.nanoboltron.jsonschema.parser.parsers.DescriptorNode
-import com.example.nanoboltron.jsonschema.parser.parsers.NumberDescriptorParser
-import com.example.nanoboltron.jsonschema.parser.parsers.StringDescriptorParser
+import com.example.nanoboltron.jsonschema.parser.parsers.BooleanDescriptorParserJsonSchema
+import com.example.nanoboltron.jsonschema.core.DescriptorNode
+import com.example.nanoboltron.jsonschema.parser.parsers.NumberDescriptorParserJsonSchema
+import com.example.nanoboltron.jsonschema.parser.parsers.StringDescriptorParserJsonSchema
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 
@@ -35,9 +35,9 @@ class JsonSchemaParser : JsonParser {
     private val type =
         Types.newParameterizedType(Map::class.java, String::class.java, Any::class.java)
     private val mapAdapter = moshi.adapter<Map<String, Any?>>(type)
-    private val stringDescriptorParser = StringDescriptorParser()
-    private val numberDescriptorParser = NumberDescriptorParser()
-    private val booleanDescriptorParser = BooleanDescriptorParser()
+    private val stringDescriptorParser = StringDescriptorParserJsonSchema()
+    private val numberDescriptorParser = NumberDescriptorParserJsonSchema()
+    private val booleanDescriptorParser = BooleanDescriptorParserJsonSchema()
 
     override fun parse(json: String): DescriptorNode? {
         val model: Map<String, Any?> = mapAdapter.fromJson(json) ?: mapOf()

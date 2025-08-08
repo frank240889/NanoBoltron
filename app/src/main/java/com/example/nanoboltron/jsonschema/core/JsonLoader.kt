@@ -1,4 +1,4 @@
-package com.example.nanoboltron
+package com.example.nanoboltron.jsonschema.core
 
 import android.content.Context
 import java.io.BufferedReader

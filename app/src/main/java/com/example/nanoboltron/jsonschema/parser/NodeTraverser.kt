@@ -1,6 +1,6 @@
 package com.example.nanoboltron.jsonschema.parser
 
-import com.example.nanoboltron.jsonschema.parser.parsers.DescriptorNode
+import com.example.nanoboltron.jsonschema.core.DescriptorNode
 
 /**
  * Component responsible for traversing DescriptorNode trees and collecting information

@@ -3,7 +3,8 @@ package com.example.nanoboltron.jsonschema.parser
 import android.util.Log
 import com.example.nanoboltron.jsonschema.core.JsonNode
 import com.example.nanoboltron.jsonschema.core.Native
-import com.example.nanoboltron.jsonschema.parser.parsers.DescriptorNode
+import com.example.nanoboltron.jsonschema.core.DescriptorNode
+import com.example.nanoboltron.jsonschema.core.FormDataNode
 
 private const val TAG = "SchemaPrinter"
 fun printUiTree(node: DescriptorNode, indent: String = "") {

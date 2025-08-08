@@ -21,19 +21,20 @@ import com.example.nanoboltron.jsonschema.THEN
 import com.example.nanoboltron.jsonschema.TITLE
 import com.example.nanoboltron.jsonschema.TYPE
 import com.example.nanoboltron.jsonschema.WRITE_ONLY
+import com.example.nanoboltron.jsonschema.core.DescriptorNode
 import com.example.nanoboltron.jsonschema.parser.JsonParser
 import com.example.nanoboltron.jsonschema.core.Key
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 
-class JsonSchemaParserPlus : JsonParser {
+class JsonSchemaParser : JsonParser {
     private val moshi = Moshi.Builder().build()
     private val type =
         Types.newParameterizedType(Map::class.java, String::class.java, Any::class.java)
     private val mapAdapter = moshi.adapter<Map<String, Any?>>(type)
-    private val stringDescriptorParser = StringDescriptorParser()
-    private val numberDescriptorParser = NumberDescriptorParser()
-    private val booleanDescriptorParser = BooleanDescriptorParser()
+    private val stringDescriptorParser = StringDescriptorParserJsonSchema()
+    private val numberDescriptorParser = NumberDescriptorParserJsonSchema()
+    private val booleanDescriptorParser = BooleanDescriptorParserJsonSchema()
 
     /**
      * Centralized path building for JSON Schema traversal

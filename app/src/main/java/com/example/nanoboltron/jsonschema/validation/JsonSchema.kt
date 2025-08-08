@@ -1,3 +1,3 @@
 package com.example.nanoboltron.jsonschema.validation
 
-sealed class ValidationResult
+sealed class JsonSchema

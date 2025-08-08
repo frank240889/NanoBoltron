@@ -1,8 +1,9 @@
-package com.example.nanoboltron.jsonschema.parser.parsers
+package com.example.nanoboltron.jsonschema.parser
 
+import com.example.nanoboltron.jsonschema.core.DescriptorNode
 import com.example.nanoboltron.jsonschema.core.Key
 
-interface NodeParser {
+interface JsonSchemaNodeParser {
     fun parse(
         type: String,
         key: Key? = null,

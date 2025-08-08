@@ -1,6 +1,5 @@
-package com.example.nanoboltron.jsonschema.validation
+package com.example.nanoboltron.jsonschema.datamanager
 
-import com.example.nanoboltron.jsonschema.FieldDataHandler
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 

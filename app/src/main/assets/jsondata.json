@@ -1,25 +1,92 @@
-[
-  {
-    "id": 1,
-    "name": "First Item",
-    "tags": [
-      "tag1",
-      "tag2"
-    ]
-  },
-  {
-    "id": 2,
-    "name": "Second Item",
-    "tags": [
-      "tag3"
-    ]
-  },
-  {
-    "id": 3,
-    "name": "Third Item",
-    "tags": [
-      "tag4",
-      "tag5"
-    ]
+{
+  "project": {
+    "id": "p-3928",
+    "name": "NextGen App",
+    "status": "active",
+    "metadata": {
+      "createdAt": "2025-08-07T10:00:00Z",
+      "lastModified": "2025-08-07T12:30:45Z",
+      "tags": ["mobile", "AI", "cloud"],
+      "visibility": "internal"
+    },
+    "owner": {
+      "id": "u-102",
+      "name": "Franco Castillo",
+      "email": "franco@example.com",
+      "roles": ["admin", "architect"],
+      "preferences": {
+        "theme": "dark",
+        "notifications": {
+          "email": true,
+          "sms": false,
+          "inApp": {
+            "taskUpdates": true,
+            "mentions": true,
+            "reminders": false
+          }
+        }
+      }
+    },
+    "teams": [
+      {
+        "id": "t-01",
+        "name": "Frontend",
+        "members": [
+          { "id": "u-301", "name": "Alice", "active": true },
+          { "id": "u-302", "name": "Bob", "active": false }
+        ]
+      },
+      {
+        "id": "t-02",
+        "name": "Backend",
+        "members": [
+          { "id": "u-401", "name": "Charlie", "active": true },
+          { "id": "u-402", "name": "Diana", "active": true }
+        ]
+      }
+    ],
+    "tasks": [
+      {
+        "id": "task-001",
+        "title": "Design onboarding UI",
+        "assignedTo": "u-301",
+        "status": "in_progress",
+        "dueDate": "2025-08-14",
+        "subtasks": [
+          {
+            "id": "sub-001",
+            "title": "Sketch wireframes",
+            "completed": true
+          },
+          {
+            "id": "sub-002",
+            "title": "Create Figma design",
+            "completed": false
+          }
+        ],
+        "comments": [
+          {
+            "user": "u-302",
+            "timestamp": "2025-08-06T15:30:00Z",
+            "message": "Should we align the design with the marketing site?"
+          }
+        ]
+      }
+    ],
+    "settings": {
+      "features": {
+        "betaAccess": true,
+        "integration": {
+          "slack": true,
+          "github": {
+            "enabled": true,
+            "repos": [
+              "nextgen-app-ui",
+              "nextgen-app-api"
+            ]
+          }
+        }
+      }
+    }
   }
-]
+}

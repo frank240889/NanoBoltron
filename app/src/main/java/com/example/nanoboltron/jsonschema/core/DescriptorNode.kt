@@ -1,18 +1,14 @@
-package com.example.nanoboltron.jsonschema.parser.parsers
+package com.example.nanoboltron.jsonschema.core
 
-import com.example.nanoboltron.jsonschema.ALL_OF
 import com.example.nanoboltron.jsonschema.BOOLEAN_NODE
 import com.example.nanoboltron.jsonschema.COMPOSITION_NODE
 import com.example.nanoboltron.jsonschema.GROUP
 import com.example.nanoboltron.jsonschema.NUMBER_NODE
 import com.example.nanoboltron.jsonschema.STRING_NODE
-import com.example.nanoboltron.jsonschema.core.JsonNode
-import com.example.nanoboltron.jsonschema.core.Key
-import com.example.nanoboltron.jsonschema.core.Type
 
 /**
  * The next descriptor classes convey the idea of how should the node be represented in the UI according
- * to the data type they hold.
+ * to the data type they hold, these represent strongly typed nodes that can be handled in Kotlin.
  * [https://json-schema.org/understanding-json-schema/reference/type]
  */
 sealed class DescriptorNode : JsonNode {
@@ -20,75 +16,6 @@ sealed class DescriptorNode : JsonNode {
     abstract val jsonSchemaType: Type
     abstract val title: String?
     abstract val description: String?
-    /**
-     * Helper function to create indented string representation
-     */
-    fun toStringIndented(indentLevel: Int = 0): String {
-        val indent = "  ".repeat(indentLevel)
-        return when (this) {
-            is GroupNode -> {
-                buildString {
-                    append("GroupNode(")
-                    append("\n${indent}  type: $type")
-                    key?.let { append("\n${indent}  key: $it") }
-                    path?.let { append("\n${indent}  path: $it") }
-                    title?.let { append("\n${indent}  title: \"$it\"") }
-                    description?.let { append("\n${indent}  description: \"$it\"") }
-                    readOnly?.let { append("\n${indent}  readOnly: $it") }
-                    writeOnly?.let { append("\n${indent}  writeOnly: $it") }
-
-                    nodes?.let { nodeList ->
-                        if (nodeList.isNotEmpty()) {
-                            append("\n${indent}  nodes: [")
-                            nodeList.forEachIndexed { index, node ->
-                                append(
-                                    "\n${indent}[${index + 1}]${
-                                        node.toStringIndented(
-                                            indentLevel + 2
-                                        )
-                                    }"
-                                )
-                            }
-                            append("\n${indent}  ]")
-                        } else {
-                            append("\n${indent}  nodes: []")
-                        }
-                    }
-                    append("\n${indent})")
-                }
-            }
-
-            is StringNode -> "${indent}$this"
-            is NumberNode -> "${indent}$this"
-            is BooleanNode -> "${indent}$this"
-            is CompositionNode -> {
-                buildString {
-                    append("${indent}CompositionNode(")
-                    append("\n${indent}  compositionType: $compositionType")
-                    key?.let { append("\n${indent}  key: $it") }
-                    title?.let { append("\n${indent}  title: \"$it\"") }
-                    append("\n${indent}  schemas: [")
-                    schemas.forEachIndexed { index, schema ->
-                        append("\n${indent}[${index + 1}]${schema.toStringIndented(indentLevel + 2)}")
-                    }
-                    append("\n${indent}  ]")
-                    append("\n${indent})")
-                }
-            }
-
-            is ConditionalNode -> {
-                buildString {
-                    append("${indent}ConditionalNode(")
-                    key?.let { append("\n${indent}  key: $it") }
-                    title?.let { append("\n${indent}  title: \"$it\"") }
-                    ifSchema?.let { append("\n${indent}  if: ${it.toStringIndented(indentLevel + 1)}") }
-                    thenSchema?.let { append("\n${indent}  then: ${it.toStringIndented(indentLevel + 1)}") }
-                    elseSchema?.let { append("\n${indent}  else: ${it.toStringIndented(indentLevel + 1)}") }
-                    append("\n${indent})")
-                }
-            }
-        }
-    }
 
     /**
      * Represents a section/group of fields, generally the root node belongs to this type
@@ -104,11 +31,7 @@ sealed class DescriptorNode : JsonNode {
         val writeOnly: Boolean? = null,
         val enum: List<DescriptorNode>? = null,
         val nodes: List<DescriptorNode>? = null
-    ) : DescriptorNode() {
-        override fun toString(): String {
-            return toStringIndented(0)
-        }
-    }
+    ) : DescriptorNode()
 
 
     /**

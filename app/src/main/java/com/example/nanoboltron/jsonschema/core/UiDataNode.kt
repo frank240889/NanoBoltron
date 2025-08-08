@@ -1,9 +1,4 @@
-package com.example.nanoboltron.jsonschema.parser
-
-import com.example.nanoboltron.jsonschema.core.JsonNode
-import com.example.nanoboltron.jsonschema.core.Key
-import com.example.nanoboltron.jsonschema.core.Path
-import com.example.nanoboltron.jsonschema.parser.parsers.DescriptorNode
+package com.example.nanoboltron.jsonschema.core
 
 sealed class UiDataNode : JsonNode {
     abstract val descriptorNode: DescriptorNode

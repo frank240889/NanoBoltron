@@ -20,23 +20,44 @@ import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 
-class JsonStringParser: JsonParser {
+class JsonFormDataParser : JsonParser {
     private val moshi = Moshi.Builder().build()
-    private val type =
+    private val objectType =
         Types.newParameterizedType(Map::class.java, String::class.java, Any::class.java)
-    private val mapAdapter = moshi.adapter<Map<String, Any?>>(type)
+    private val listType = Types.newParameterizedType(List::class.java, Any::class.java)
+    private val mapAdapter = moshi.adapter<Map<String, Any?>>(objectType)
+    private val listAdapter = moshi.adapter<List<Any?>>(listType)
 
     override fun parse(json: String): JsonNode? {
-        return try {
-            val parsedData = parseJsonString(json)
-            buildTreeNode(parsedData, null, null)
-        } catch (e: JsonDataException) {
+        val objectData = parseJsonObject(json)
+        val listData = parseJsonList(json)
+        val parsedData = when {
+            objectData != null -> objectData
+            listData != null -> listData
+            else -> null
+        }
+        return if (parsedData == null) {
             null
+        } else {
+            buildTreeNode(parsedData, null, null)
         }
     }
 
-    private fun parseJsonString(json: String): Map<String, Any?> {
-        return mapAdapter.fromJson(json) ?: mapOf()
+    private fun parseJsonObject(json: String): Map<String, Any?>? {
+        return try {
+            mapAdapter.fromJson(json) ?: mapOf()
+        } catch (e: JsonDataException) {
+            null
+        }
+
+    }
+
+    private fun parseJsonList(json: String): List<Any?>? {
+        return try {
+            listAdapter.fromJson(json) ?: listOf()
+        } catch (e: JsonDataException) {
+            null
+        }
     }
 
     private fun buildTreeNode(value: Any?, key: Key?, path: Path?): JsonNode {

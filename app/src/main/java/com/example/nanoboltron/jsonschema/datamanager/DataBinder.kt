@@ -1,6 +1,6 @@
 package com.example.nanoboltron.jsonschema.datamanager
 
-import com.example.nanoboltron.jsonschema.parser.UiDataNode
+import com.example.nanoboltron.jsonschema.core.UiDataNode
 import com.example.nanoboltron.jsonschema.core.Key
 
 interface DataBinder {

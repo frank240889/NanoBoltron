@@ -1,6 +1,6 @@
 package com.example.nanoboltron.jsonschema.validation
 
-import com.example.nanoboltron.jsonschema.JsonSchema
+import com.example.nanoboltron.jsonschema.validation.JsonSchema
 
 interface JsonSchemaValidator {
     fun validate(
